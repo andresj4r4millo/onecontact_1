@@ -16,7 +16,7 @@ reglist=[]
 cone=0
 errorlist=[]
 doclist=[]
-
+#comentario
 dicplan={
     "WOM": '/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div/div[5]/div/div/div/div[2]/div[4]/fieldset/div[1]/span/span/input',
     "TIGO": '/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div/div[5]/div/div/div/div[2]/div[13]/fieldset/div[1]/span/span/input',
