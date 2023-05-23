@@ -134,10 +134,8 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,correo,plan
     while num<6:
         try:
             try:
-                #//*[@id="viewErrors"]/ul/li[2]
                 wait = WebDriverWait(driver, 10)
-                #porta = wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="viewErrors"]/ul/li[2]')))
-                #porta=driver.find_element('xpath','//*[@id="viewErrors"]/ul/li[2]')
+
                 div_element = wait.until(EC.visibility_of_element_located((By.ID, 'viewErrors')))
 
                 # Obtener el elemento de texto dentro del div
@@ -147,7 +145,6 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,correo,plan
                     driver.find_element("xpath",'//*[@id="btnPrev"]').click()
                     time.sleep(1)
                     conp=0
-                    #perform(conp)
                     while conp<6:
                         try:
                             acction = ActionChains(driver)
@@ -188,7 +185,6 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,correo,plan
                     except:
                         #regresar
                         cone+=1
-                num=6
                 break            
             except Exception as e:
                 cone=0
@@ -205,24 +201,14 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,correo,plan
                     except:
                         #regresar
                         cone+=1
-                num=6
                 break    
             num+=1
         except:
             num+=1
 
-    if cone>=5:
-        try:
-            ##las siguientes lineas de codigo evaluan si el rechazo no pasa por el documento
-            element = driver.find_element(By.XPATH,'//*[@id="validationResponses"]/div[6]/div[2]/div[3]/div/div/div')
-            document= element.text
-            if 'DOCUMENTO NO APLICA PARA ACTIVACIÓN POLIEDRO' in document:
-                doclist.append(cedula)
-                print("documento no aplica")
-        except:
-            print("documento aplica")
 
-    if cone>=5 or conp>=6 or num>=5:
+
+    if cone>5 or conp>=6:
         errorlist.append(cedula)  
         driver.find_element('xpath','//*[@id="DetailProduct_MinBroughtPortability"]').click()  
         #para generar error
@@ -235,7 +221,7 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,correo,plan
     while cone<=4:
         try:
             time.sleep(3)
-            #CLASES DE ACTIVACION 
+            #CLASES DE ACTIVACION //*[@id="ActivationClass_CfmToFirstInvoice"]
             driver.find_element('xpath','//*[@id="ActivationClass_CfmToFirstInvoice"]').click()
             driver.find_element('xpath','//*[@id="ActivationClass_LinkPreactivation"]').click()
             #CORREO DEL CLIENTE //*[@id="PersonalInfo_Email"]
@@ -318,7 +304,6 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,correo,plan
             driver.find_element('xpath',"/html/body/span/span/span[1]/input").send_keys("MOTOROLA")
             time.sleep(3)
             driver.find_element('xpath',"/html/body/span/span/span[1]/input").send_keys(Keys.ENTER)
-            
             #SELECCIONAR PLAN //*[@id="select2-EquipmentPlanDataViewModel_Plan-container"]
             time.sleep(3)
             driver.find_element('xpath','//*[@id="select2-EquipmentPlanDataViewModel_Plan-container"]').click()
@@ -395,15 +380,8 @@ def ingreso():
     #IR A INICIO POLIEDRO
     driver.find_element('xpath','//*[@id="ctl00_ContentPlaceHolder1_BtnRegresarMensaje"]').click()
     #ESPERAR A QUE CARGUE LA PAGINA WEB
-    time.sleep(20)
-    #INGRESAR A POLIEDRO
-    driver.find_element('xpath','//*[@id="btnIngresarUsuarioContraseña"]').click()
-    #ESPERAR A QUE SE INGRESE TOKEN
-    time.sleep(22)
-    #INGRESAR TOKEN
-    driver.find_element('xpath','//*[@id="ctl00_ContentPlaceHolder1_BtnLoginTokenEntrust"]').click()
-    time.sleep(2)
-    #ESPERAR A QUE CARGUE POLIEDRO
+def activacion_pospago():
+
     time.sleep(4)
     #OPCIONES DE ACTIVACION
     driver.find_element('xpath',"/html/body/table/tbody/tr[5]/td/table/tbody/tr/td[1]/div[1]/div[1]/div[5]").click()
@@ -463,6 +441,12 @@ driver = webdriver.Edge('msedgedriver.edge')
 df = pd.read_csv('BASEP.csv', encoding = 'latin-1')
 df
 ingreso()
+paso="no"
+print("ya ingresaste a la pagina?")
+paso=input()
+if paso.upper()=="SI":
+    print("ejecutando poliedro")
+activacion_pospago()
 contador=0
 iterador=1
 for row, datos in df.iterrows():
