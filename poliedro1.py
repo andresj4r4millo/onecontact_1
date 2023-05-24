@@ -121,94 +121,25 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,correo,plan
     if cone>=6:
         driver.find_element('xpath','//*[@id="DetailProduct_MinBroughtPortability"]').click()
 
-
-    ##FORMULARIO 2    
-    #time.sleep(3)
-    #LA SIGUIENTE ESTRUCTURA
-    #1. EVALUA SI LA PORTABILIDAD NUMERICA ES FALSA
-    #2. DE LO CONTRARIO DARA CLICK EN EL BOTON DE CONTINUAR HASTA QUE SE REDIRECCIONE, 
-    # SI EL PUNTO 2 ES EXITOSO ES PORQUE EL RECHAZO PUEDE SER ENVIADO, DE LO CONTRARIO
-    #3. AL NO REDIRIGIRSE DESPUES DE 6 INTENTOS LA CEDULA DEL CLIENTE SE AGREGARA EN LA LISTA DE ERRORES, SALDRA DE LA ESTRUCTURA
-    # AL SALIR DE LA ESTRUCTURA SI NO SE REDIRECCIONA LA PAGINA GENERARA ERROR PARA CONTINUAR CON EL SIGUIENTE RECHAZO
-    num=0
-    while num<6:
+    
+    cone=0
+    while cone<5:
         try:
-            try:
-                wait = WebDriverWait(driver, 10)
-
-                div_element = wait.until(EC.visibility_of_element_located((By.ID, 'viewErrors')))
-
-                # Obtener el elemento de texto dentro del div
-                li_element = div_element.find_element(By.XPATH, './ul/li[2]')
-                text = li_element.text
-                if 'Solicitud Portabilidad Numerica = Falso' in text:
-                    driver.find_element("xpath",'//*[@id="btnPrev"]').click()
-                    time.sleep(1)
-                    conp=0
-                    while conp<6:
-                        try:
-                            acction = ActionChains(driver)
-                            acction.double_click(driver.find_element(By.XPATH, '//*[@id="DetailProduct_SellerId"]')).perform()
-                            time.sleep(1)
-                            driver.find_element(By.XPATH, '//*[@id="DetailProduct_SellerId"]').send_keys(cedulaa)
-                            time.sleep(1)
-                            campo_fecha.clear()
-                            #javascript para definir valor en el input de la fecha, ya que al enviar valores este desaparece
-                            driver.execute_script(f'document.getElementById("DetailProduct_PortabilityDate").value = "{fechap}";')
-                            time.sleep(2)
-                            driver.find_element(By.XPATH,'//*[@id="btnNext"]').click()
-                            time.sleep(3)
-                            driver.find_element('xpath','/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div/div[5]/div[2]/div[11]/div/div[2]/div[2]/div').click()
-                            break
-                        except:
-                            conp+=1
-                            continue
-                    print("porta falso")
-                else:
-                    #codigo el 
-                    errorlist.append(cedula)
-                    conp=6
-                    break
-                num+=1
-            except NoSuchElementException:
-                cone=0
-                while cone<5:
-                    try:
-                        #driver.find_element(By.XPATH, '//*[@id="btnNext"]').click()
-                        #time.sleep(2) 
-                        #driver.find_element(By.XPATH, '//*[@id="ActivationClass_CfmToFirstInvoice"]')
-                        time.sleep(2)
-                        driver.find_element('xpath','//*[@id="btnNext"]').click()
-                        time.sleep(6) 
-                        driver.find_element('xpath','//*[@id="ActivationClass_CfmToFirstInvoice"]')
-                        break
-                    except:
-                        #regresar
-                        cone+=1
-                break            
-            except Exception as e:
-                cone=0
-                while cone<5:
-                    try:
-                        #driver.find_element(By.XPATH, '//*[@id="btnNext"]').click()
-                        #time.sleep(2) 
-                        #driver.find_element(By.XPATH, '//*[@id="ActivationClass_CfmToFirstInvoice"]')
-                        time.sleep(2)
-                        driver.find_element('xpath','//*[@id="btnNext"]').click()
-                        time.sleep(6) 
-                        driver.find_element('xpath','//*[@id="ActivationClass_CfmToFirstInvoice"]')
-                        break
-                    except:
-                        #regresar
-                        cone+=1
-                break    
-            num+=1
+            #driver.find_element(By.XPATH, '//*[@id="btnNext"]').click()
+            #time.sleep(2) 
+            #driver.find_element(By.XPATH, '//*[@id="ActivationClass_CfmToFirstInvoice"]')
+            time.sleep(2)
+            driver.find_element('xpath','//*[@id="btnNext"]').click()
+            time.sleep(6) 
+            driver.find_element('xpath','//*[@id="ActivationClass_CfmToFirstInvoice"]')
+            break
         except:
-            num+=1
+            #regresar
+            cone+=1
+       
+    
 
-    wait = WebDriverWait(driver, 10)
-    print(cone + conp)
-    if cone>5 or conp>=6:
+    if cone>5:
         errorlist.append(cedula)  
         driver.find_element('xpath','//*[@id="DetailProduct_MinBroughtPortability"]').click()  
         #para generar error
