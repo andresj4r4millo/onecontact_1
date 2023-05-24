@@ -118,10 +118,10 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,correo,plan
                     errorlist.append(cedula)
                     break
     #ESTAS LINEAS DE CODIGO GENERARAN ERROR SI LA PAGINA NO REALIZA LA CONSULTA DESPUES DE 6 INTENTOS
-    if cone>=6:
+    if cone>=5:
         driver.find_element('xpath','//*[@id="DetailProduct_MinBroughtPortability"]').click()
-
     
+
     cone=0
     while cone<5:
         try:
@@ -130,7 +130,7 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,correo,plan
             #driver.find_element(By.XPATH, '//*[@id="ActivationClass_CfmToFirstInvoice"]')
             time.sleep(2)
             driver.find_element('xpath','//*[@id="btnNext"]').click()
-            time.sleep(6) 
+            time.sleep(3) 
             driver.find_element('xpath','//*[@id="ActivationClass_CfmToFirstInvoice"]')
             break
         except:
@@ -139,7 +139,7 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,correo,plan
        
     
 
-    if cone>5:
+    if cone>=5:
         errorlist.append(cedula)  
         driver.find_element('xpath','//*[@id="DetailProduct_MinBroughtPortability"]').click()  
         #para generar error
