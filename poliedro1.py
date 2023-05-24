@@ -2,7 +2,7 @@
 from selenium import webdriver
 import time
 from selenium.webdriver.common.action_chains import ActionChains
-import requests
+
 import pandas as pd
 from lxml import html
 from selenium.webdriver.common.by import By
@@ -179,7 +179,7 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,correo,plan
                         #driver.find_element(By.XPATH, '//*[@id="ActivationClass_CfmToFirstInvoice"]')
                         time.sleep(2)
                         driver.find_element('xpath','//*[@id="btnNext"]').click()
-                        time.sleep(2) 
+                        time.sleep(6) 
                         driver.find_element('xpath','//*[@id="ActivationClass_CfmToFirstInvoice"]')
                         break
                     except:
@@ -195,7 +195,7 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,correo,plan
                         #driver.find_element(By.XPATH, '//*[@id="ActivationClass_CfmToFirstInvoice"]')
                         time.sleep(2)
                         driver.find_element('xpath','//*[@id="btnNext"]').click()
-                        time.sleep(2) 
+                        time.sleep(6) 
                         driver.find_element('xpath','//*[@id="ActivationClass_CfmToFirstInvoice"]')
                         break
                     except:
@@ -206,8 +206,8 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,correo,plan
         except:
             num+=1
 
-
-
+    wait = WebDriverWait(driver, 10)
+    print(cone + conp)
     if cone>5 or conp>=6:
         errorlist.append(cedula)  
         driver.find_element('xpath','//*[@id="DetailProduct_MinBroughtPortability"]').click()  
