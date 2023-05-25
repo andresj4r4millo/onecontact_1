@@ -118,7 +118,7 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,correo,plan
                     errorlist.append(cedula)
                     break
     #ESTAS LINEAS DE CODIGO GENERARAN ERROR SI LA PAGINA NO REALIZA LA CONSULTA DESPUES DE 6 INTENTOS
-    if cone>=5:
+    if cone>=6:
         driver.find_element('xpath','//*[@id="DetailProduct_MinBroughtPortability"]').click()
     
 
