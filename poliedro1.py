@@ -36,7 +36,7 @@ dicplan={
 
 
 
-def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist, doclist):
+def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist):
     
     #primeros pasos, primer formulario
     #while con el fin de no lanzar error si el script no encuentra los elementos en la pagina
@@ -152,7 +152,8 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist, 
             #regresar
             cone+=1
             continue
-       
+
+def validaciones():    
     if cone>=5:
         try:
             ##las siguientes lineas de codigo evaluan si el rechazo no pasa por el documento
@@ -468,14 +469,16 @@ for row, datos in df.iterrows():
     try:
         inicio()
         time.sleep(1)
-        formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,doclist)
+        formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist)
+        validaciones()
         forms2(correo,plan,reglist,selleccion)
         contador=contador+1
     except:
         try:
             inicio()
             time.sleep(1)
-            formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,doclist)
+            formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist)
+            validaciones()
             forms2(correo,plan,reglist,selleccion)
             contador=contador+1
         except Exception as e:
