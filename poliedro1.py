@@ -16,6 +16,9 @@ reglist=[]
 cone=0
 errorlist=[]
 doclist=[]
+niplist=[]
+operlist=[]
+
 #comentario
 dicplan={
     "WOM": '/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div/div[5]/div/div/div/div[2]/div[4]/fieldset/div[1]/span/span/input',
@@ -33,49 +36,108 @@ dicplan={
 
 
 
-def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,correo,plan,selleccion,reglist,errorlist,cone,cedul, doclist):
-    campo_fecha=driver.find_element(By.ID,'DetailProduct_PortabilityDate')
+def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist, doclist):
+    
     #primeros pasos, primer formulario
     #while con el fin de no lanzar error si el script no encuentra los elementos en la pagina
-    while True:
-        try:
-            #FORMULARIO 1
-            #LLENAR CEDULA //*[@id="DetailProduct_DocumentNumber"]
-            time.sleep(2)
-            driver.find_element('xpath','//*[@id="DetailProduct_DocumentNumber"]').send_keys(cedula)
-            #LLENAR APELLIDO
-            driver.find_element('xpath','//*[@id="DetailProduct_LastName"]').clear()
-            driver.find_element('xpath','//*[@id="DetailProduct_LastName"]').send_keys(apellido)
-            #NO TRAJO EQUIPO
-            driver.find_element('xpath','//*[@id="DetailProduct_WithoutImeiRegistryCheck"]').click()
-            #CEDULA ASESOR
-            accion = ActionChains(driver)
-            accion.double_click(driver.find_element('xpath','//*[@id="DetailProduct_SellerId"]')).perform()
-            driver.find_element('xpath','//*[@id="DetailProduct_SellerId"]').send_keys(cedulaa)
-            time.sleep(1)
-            #CHECK PORTABILIDAD NUMERICA
-            driver.find_element('xpath','//*[@id="DetailProduct_PortabilityNumberCheck"]').click()
-            #ESPERAR A QUE CARGUE POLIEDRO
-            time.sleep(1)
-            #MIN A PORTAR
-            driver.find_element('xpath','//*[@id="DetailProduct_PortabilityNumber"]').send_keys(celular)
-            #NIP //*[@id="DetailProduct_NIP"]
-            driver.find_element('xpath','//*[@id="DetailProduct_NIP"]').click()
-            driver.find_element('xpath','//*[@id="DetailProduct_NIP"]').send_keys(nip)
-            #FECHA DE PORTACION
-            #driver.find_element('xpath','//*[@id="DetailProduct_PortabilityDate"]').clear()
-            #driver.find_element('xpath','//*[@id="DetailProduct_PortabilityDate"]').send_keys(fechap)
-            campo_fecha.clear()
-            driver.execute_script(f'document.getElementById("DetailProduct_PortabilityDate").value = "{fechap}";')
-            #SERIAL SIM CARD
-            accion = ActionChains(driver)
-            # /html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div[2]/div[1]/div[2]/div[2]/div/input
-            accion.double_click(driver.find_element('xpath',"/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div[2]/div[1]/div[2]/div[2]/div/input")).perform()
-            driver.find_element('xpath',"/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div[2]/div[1]/div[2]/div[2]/div/input").send_keys(serialsim)
-            
-            break
-        except:
-            continue
+    cone=0
+    try:
+
+        while cone<10:
+            print(f"iteracion: {str(cone)}")
+            try:
+                #FORMULARIO 1
+                #LLENAR CEDULA //*[@id="DetailProduct_DocumentNumber"]
+                time.sleep(2)
+                ced=driver.find_element(By.ID('DetailProduct_DocumentNumber'))
+                ced.send_keys(cedula)
+                #LLENAR APELLIDO
+                driver.find_element('xpath','//*[@id="DetailProduct_LastName"]').clear()
+
+                driver.find_element('xpath','//*[@id="DetailProduct_LastName"]').send_keys(apellido)
+                #NO TRAJO EQUIPO
+                driver.find_element('xpath','//*[@id="DetailProduct_WithoutImeiRegistryCheck"]').click()
+                #CEDULA ASESOR
+                accion = ActionChains(driver)
+                accion.double_click(driver.find_element('xpath','//*[@id="DetailProduct_SellerId"]')).perform()
+                driver.find_element('xpath','//*[@id="DetailProduct_SellerId"]').send_keys(cedulaa)
+                time.sleep(1)
+                #CHECK PORTABILIDAD NUMERICA
+                driver.find_element('xpath','//*[@id="DetailProduct_PortabilityNumberCheck"]').click()
+                #ESPERAR A QUE CARGUE POLIEDRO
+                time.sleep(1)
+                #MIN A PORTAR
+                driver.find_element('xpath','//*[@id="DetailProduct_PortabilityNumber"]').send_keys(celular)
+                #NIP //*[@id="DetailProduct_NIP"]
+                driver.find_element('xpath','//*[@id="DetailProduct_NIP"]').click()
+                driver.find_element('xpath','//*[@id="DetailProduct_NIP"]').send_keys(nip)
+                #FECHA DE PORTACION
+                #driver.find_element('xpath','//*[@id="DetailProduct_PortabilityDate"]').clear()
+                #driver.find_element('xpath','//*[@id="DetailProduct_PortabilityDate"]').send_keys(fechap)
+                campo_fecha=driver.find_element(By.ID,'DetailProduct_PortabilityDate')
+                time.sleep(1)
+                campo_fecha.clear()
+                driver.execute_script(f'document.getElementById("DetailProduct_PortabilityDate").value = "{fechap}";')
+                #SERIAL SIM CARD
+                accion = ActionChains(driver)
+                # /html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div[2]/div[1]/div[2]/div[2]/div/input
+                accion.double_click(driver.find_element('xpath',"/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div[2]/div[1]/div[2]/div[2]/div/input")).perform()
+                driver.find_element('xpath',"/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div[2]/div[1]/div[2]/div[2]/div/input").send_keys(serialsim)
+
+                break
+            except:
+                cone+=1
+                continue
+    except:
+        cone=0
+        while cone<10:
+            print(f"iteracion: {str(cone)}")
+            try:
+                #FORMULARIO 1
+                #LLENAR CEDULA //*[@id="DetailProduct_DocumentNumber"]
+                time.sleep(2)
+                ced=driver.find_element(By.ID('DetailProduct_DocumentNumber'))
+                ced.send_keys(cedula)
+                #LLENAR APELLIDO
+                driver.find_element('xpath','//*[@id="DetailProduct_LastName"]').clear()
+                driver.find_element('xpath','//*[@id="DetailProduct_LastName"]').send_keys(apellido)
+                #NO TRAJO EQUIPO
+                driver.find_element('xpath','//*[@id="DetailProduct_WithoutImeiRegistryCheck"]').click()
+                #CEDULA ASESOR
+                accion = ActionChains(driver)
+                accion.double_click(driver.find_element('xpath','//*[@id="DetailProduct_SellerId"]')).perform()
+                driver.find_element('xpath','//*[@id="DetailProduct_SellerId"]').send_keys(cedulaa)
+                time.sleep(1)
+                #CHECK PORTABILIDAD NUMERICA
+                driver.find_element('xpath','//*[@id="DetailProduct_PortabilityNumberCheck"]').click()
+                #ESPERAR A QUE CARGUE POLIEDRO
+                time.sleep(1)
+                #MIN A PORTAR
+                driver.find_element('xpath','//*[@id="DetailProduct_PortabilityNumber"]').send_keys(celular)
+                #NIP //*[@id="DetailProduct_NIP"]
+                driver.find_element('xpath','//*[@id="DetailProduct_NIP"]').click()
+                driver.find_element('xpath','//*[@id="DetailProduct_NIP"]').send_keys(nip)
+                #FECHA DE PORTACION
+                #driver.find_element('xpath','//*[@id="DetailProduct_PortabilityDate"]').clear()
+                #driver.find_element('xpath','//*[@id="DetailProduct_PortabilityDate"]').send_keys(fechap)
+                campo_fecha=driver.find_element(By.ID,'DetailProduct_PortabilityDate')
+                time.sleep(1)
+                campo_fecha.clear()
+                driver.execute_script(f'document.getElementById("DetailProduct_PortabilityDate").value = "{fechap}";')
+                #SERIAL SIM CARD
+                accion = ActionChains(driver)
+                # /html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div[2]/div[1]/div[2]/div[2]/div/input
+                accion.double_click(driver.find_element('xpath',"/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div[2]/div[1]/div[2]/div[2]/div/input")).perform()
+                driver.find_element('xpath',"/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div[2]/div[1]/div[2]/div[2]/div/input").send_keys(serialsim)
+
+                break
+            except:
+                cone+=1
+                continue
+
+    if cone>=10:
+        driver.find_element('xpath',"/html/body/span/span/span[2]/ul/li[2]").click()
+
     #llenar los ultimos datos y dar click en el boton de realizar consulta
     try:
 
@@ -123,7 +185,7 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,correo,plan
     
 
     cone=0
-    while cone<5:
+    while cone<6:
         try:
             #driver.find_element(By.XPATH, '//*[@id="btnNext"]').click()
             #time.sleep(2) 
@@ -136,10 +198,19 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,correo,plan
         except:
             #regresar
             cone+=1
+            continue
        
-    
-
     if cone>=5:
+        try:
+            ##las siguientes lineas de codigo evaluan si el rechazo no pasa por el documento
+            element = driver.find_element('xpath','//*[@id="validationResponses"]/div[6]/div[2]/div[3]/div/div/div')
+            document= element.text
+            if document=="DOCUMENTO NO APLICA PARA ACTIVACIÓN POLIEDRO":
+                doclist.appen(cedula)
+        except:
+            print("documnto aplica")
+                
+    if cone>=6:
         errorlist.append(cedula)  
         driver.find_element('xpath','//*[@id="DetailProduct_MinBroughtPortability"]').click()  
         #para generar error
@@ -148,6 +219,10 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,correo,plan
     ####FORMULARIO 3#####
     #APARTIR DE AQUI SE DEFINE SI EL RECHAZO PASA O NO, HAY VARIAS ESTRUCTURAS PARA QUE LOS CAMPOS SEAN DILIGENCIADOS O LLENADOS
     #CON EL FIN DE EVITAR QUE ALGUN CMPO QUEDE SIN SER SELECCIONADO ESTAN EN ESTRUCTURAS CICLICAS POR PASOS.
+
+
+
+def forms2(correo,plan,reglist,selleccion):
     cone=0
     while cone<=4:
         try:
@@ -181,6 +256,7 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,correo,plan
             break
         except:
             cone+=1
+            continue
     #para generar error en caso de que los elementos no se hagan presentes
     if cone>=4:
         driver.find_element('xpath','//*[@id="DetailProduct_MinBroughtPortability"]').click()
@@ -287,6 +363,8 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,correo,plan
             driver.find_element('xpath','//*[@id="btnPrev"]').click()
             #driver.find_element('xpath','//*[@id="containerNavBar"]/ul/li[9]/a').click()
             reglist.append(cedula)
+            print(f"rechazo enviado")
+            print(f"cedula: {cedula}")
             break
         except:
             cone+=1
@@ -425,7 +503,7 @@ for row, datos in df.iterrows():
         sellecion='/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div/div[5]/div/div/div/div[2]/div[2]/fieldset/div[1]/span/span/input'
     cedulaa=str(cedul)
     cedula=str(cc)
-    plan=int(planb)
+    plan=str(planb)
 
     if opc.upper()=="S":
         cedulaa=str(cedul)
@@ -437,13 +515,15 @@ for row, datos in df.iterrows():
     try:
         inicio()
         time.sleep(1)
-        formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,correo,plan,selleccion,reglist,errorlist,cone,cedul,doclist)
+        formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,doclist)
+        forms2(correo,plan,reglist,selleccion)
         contador=contador+1
     except:
         try:
             inicio()
             time.sleep(1)
-            formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,correo,plan,sellecion,reglist,errorlist,cone,cedul,doclist)
+            formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,doclist)
+            forms2(correo,plan,reglist,selleccion)
             contador=contador+1
         except Exception as e:
             print(f"error al llenar el formulario {e}")
@@ -451,6 +531,8 @@ for row, datos in df.iterrows():
     finally:
         time.sleep(1)
         print("one contact")
+    print(f"iteracion:{iterador}")
+    print(f"")
 
      
 
