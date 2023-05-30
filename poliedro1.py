@@ -45,10 +45,12 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist):
             print(f"iteracion: {str(cone)}")
             try:
                 #FORMULARIO 1
-                #LLENAR CEDULA //*[@id="DetailProduct_DocumentNumber"]
+                #LLENAR CEDULA //*[@id="DetailProduct_DocumentNumber"]porta = driver.find_element(By.XPATH, '//*[@id="viewErrors"]/ul/li[2]')
+                ced=driver.find_element(By.XPATH, '//*[@id="DetailProduct_DocumentNumber"]')
                 time.sleep(2)
-                ced=driver.find_element(By.ID('DetailProduct_DocumentNumber'))
+                #ced=driver.find_element(By.XPATH('/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div[2]/div[1]/div[1]/div[2]/div/input'))
                 ced.send_keys(cedula)
+
                 #LLENAR APELLIDO
                 driver.find_element('xpath','//*[@id="DetailProduct_LastName"]').clear()
 
@@ -217,18 +219,18 @@ def forms2(correo,plan,reglist,selleccion):
         driver.find_element('xpath','//*[@id="DetailProduct_MinBroughtPortability"]').click()
     cone=0
     #pospago boton de seleccion
+    buton=driver.find_element(By.XPATH,'//*[@id="PersonalInfo_ProductDonorOperator"]')  
     time.sleep(2)
     while True:
         try:
-            driver.find_element('xpath','//*[@id="PersonalInfo_ProductDonorOperator"]').click()
+            driver.find_element(By.XPATH,'//*[@id="PersonalInfo_ProductDonorOperator"]').click()
             #driver.find_element("xpath",'//*[@id="group_4"]/div[2]/div[1]/div/div/div[1]/span/span').click()
-            #CONTINUAR 
+            #CONTINUAR //*[@id="PhoneNumber"]
             print("pospago seleccionado")
             break
         except:
             continue
-
-    buton=driver.find_element(By.ID,'PersonalInfo_ProductDonorOperator')       
+     
     cone=0
     while cone<=4:
         try:           
@@ -243,12 +245,16 @@ def forms2(correo,plan,reglist,selleccion):
                 driver.find_element('xpath','//*[@id="Sendbill_Email"]').click()
                 driver.find_element('xpath','//*[@id="Sendbill_Email"]').clear()
                 driver.find_element('xpath','//*[@id="Sendbill_Email"]').send_keys(f"{ncorreo[0]}@yahoo.com")
+                accion = ActionChains(driver)
+                accion.double_click(driver.find_element('xpath','//*[@id="PhoneNumber"]')).perform()
+                time.sleep(1)
+                driver.find_element('xpath','//*[@id="PhoneNumber"]').send_keys(1111111)
                 time.sleep(1)
                 if buton.is_selected():
                     driver.find_element('xpath','//*[@id="btnNext"]').click()
                 else:
                     time.sleep(1)
-                    driver.find_element('xpath','//*[@id="PersonalInfo_ProductDonorOperator"]').click()
+                    buton.click()
                     time.sleep(1)
                     driver.find_element('xpath','//*[@id="btnNext"]').click()
                 time.sleep(1)
@@ -274,7 +280,7 @@ def forms2(correo,plan,reglist,selleccion):
             time.sleep(2)
             driver.find_element('xpath',"/html/body/span/span/span[1]/input").send_keys(Keys.ENTER)
             time.sleep(5)
-            #//*[@id="select2-EquipmentPlanDataViewModel_Mo
+            #//*[@id="select2-EquipmentPlanDataViewModel_Mo 
             break
         except:
             time.sleep(1)
@@ -408,7 +414,7 @@ ingreso()
 paso="no"
 print("ya ingresaste a la pagina?")
 paso=input()
-if paso.upper()=="SI":
+if paso.upper()!="NO":
     print("ejecutando poliedro")
 activacion_pospago()
 contador=0
