@@ -137,6 +137,9 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist):
         driver.find_element('xpath','//*[@id="DetailProduct_MinBroughtPortability"]').click()
     
 
+    
+
+def validaciones():   
     cone=0
     while cone<6:
         try:
@@ -151,9 +154,7 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist):
         except:
             #regresar
             cone+=1
-            continue
-
-def validaciones():    
+            continue 
     if cone>=5:
         try:
             ##las siguientes lineas de codigo evaluan si el rechazo no pasa por el documento
