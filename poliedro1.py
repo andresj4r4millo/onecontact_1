@@ -139,7 +139,7 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist):
 
     
 #ESTA FUNCION EVALUARA SI EL RECHAZO PASA O NO, Y EL PORQUE, PARA SEGMENTARLO POR LISTAS
-def validaciones():   
+def validaciones(doclist, niplist, operlist):   
     cone=0
     while cone<6:
         try:
@@ -471,7 +471,7 @@ for row, datos in df.iterrows():
         inicio()
         time.sleep(1)
         formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist)
-        validaciones()
+        validaciones(doclist, niplist, operlist)
         forms2(correo,plan,reglist,selleccion)
         contador=contador+1
     except:
@@ -479,7 +479,7 @@ for row, datos in df.iterrows():
             inicio()
             time.sleep(1)
             formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist)
-            validaciones()
+            validaciones(doclist, niplist, operlist)
             forms2(correo,plan,reglist,selleccion)
             contador=contador+1
         except Exception as e:
