@@ -179,7 +179,7 @@ def validaciones(doclist, niplist, operlist):
 
 
 
-def forms2(correo,plan,reglist,selleccion):
+def forms2(correo,plan,reglist,selleccion,numlist):
     cone=0
     while cone<=4:
         try:
@@ -287,6 +287,7 @@ def forms2(correo,plan,reglist,selleccion):
             cone+=1
     #para generar error en caso de que la pagina no cargue ningun elemento
     if  cone>=6:
+        numlist.append(cedula)
         driver.find_element('xpath','//*[@id="DetailProduct_MinBroughtPortability"]').click()
 
     #SELECCIONAR CAMPAÑA DE BENEFICIOS  
