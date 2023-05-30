@@ -41,9 +41,7 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist, 
     #primeros pasos, primer formulario
     #while con el fin de no lanzar error si el script no encuentra los elementos en la pagina
     cone=0
-    try:
-
-        while cone<10:
+    while cone<10:
             print(f"iteracion: {str(cone)}")
             try:
                 #FORMULARIO 1
@@ -88,52 +86,7 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist, 
             except:
                 cone+=1
                 continue
-    except:
-        cone=0
-        while cone<10:
-            print(f"iteracion: {str(cone)}")
-            try:
-                #FORMULARIO 1
-                #LLENAR CEDULA //*[@id="DetailProduct_DocumentNumber"]
-                time.sleep(2)
-                ced=driver.find_element(By.ID('DetailProduct_DocumentNumber'))
-                ced.send_keys(cedula)
-                #LLENAR APELLIDO
-                driver.find_element('xpath','//*[@id="DetailProduct_LastName"]').clear()
-                driver.find_element('xpath','//*[@id="DetailProduct_LastName"]').send_keys(apellido)
-                #NO TRAJO EQUIPO
-                driver.find_element('xpath','//*[@id="DetailProduct_WithoutImeiRegistryCheck"]').click()
-                #CEDULA ASESOR
-                accion = ActionChains(driver)
-                accion.double_click(driver.find_element('xpath','//*[@id="DetailProduct_SellerId"]')).perform()
-                driver.find_element('xpath','//*[@id="DetailProduct_SellerId"]').send_keys(cedulaa)
-                time.sleep(1)
-                #CHECK PORTABILIDAD NUMERICA
-                driver.find_element('xpath','//*[@id="DetailProduct_PortabilityNumberCheck"]').click()
-                #ESPERAR A QUE CARGUE POLIEDRO
-                time.sleep(1)
-                #MIN A PORTAR
-                driver.find_element('xpath','//*[@id="DetailProduct_PortabilityNumber"]').send_keys(celular)
-                #NIP //*[@id="DetailProduct_NIP"]
-                driver.find_element('xpath','//*[@id="DetailProduct_NIP"]').click()
-                driver.find_element('xpath','//*[@id="DetailProduct_NIP"]').send_keys(nip)
-                #FECHA DE PORTACION
-                #driver.find_element('xpath','//*[@id="DetailProduct_PortabilityDate"]').clear()
-                #driver.find_element('xpath','//*[@id="DetailProduct_PortabilityDate"]').send_keys(fechap)
-                campo_fecha=driver.find_element(By.ID,'DetailProduct_PortabilityDate')
-                time.sleep(1)
-                campo_fecha.clear()
-                driver.execute_script(f'document.getElementById("DetailProduct_PortabilityDate").value = "{fechap}";')
-                #SERIAL SIM CARD
-                accion = ActionChains(driver)
-                # /html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div[2]/div[1]/div[2]/div[2]/div/input
-                accion.double_click(driver.find_element('xpath',"/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div[2]/div[1]/div[2]/div[2]/div/input")).perform()
-                driver.find_element('xpath',"/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div[2]/div[1]/div[2]/div[2]/div/input").send_keys(serialsim)
 
-                break
-            except:
-                cone+=1
-                continue
 
     if cone>=10:
         driver.find_element('xpath',"/html/body/span/span/span[2]/ul/li[2]").click()
