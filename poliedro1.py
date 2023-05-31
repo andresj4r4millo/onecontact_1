@@ -149,23 +149,17 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,s
     
 #ESTA FUNCION EVALUARA SI EL RECHAZO PASA O NO, Y EL PORQUE, PARA SEGMENTARLO POR LISTAS
 def validaciones(doclist, niplist, operlist): 
-
+    cone=0
     try:
         nip=driver.find_element(By.XPATH,'//*[@id="validationResponses"]/div[5]/div[2]/div[11]/div/div[2]/div[1]')
         nip.click()
         if 'El Min ingresado se encuentra en otra solicitud de Portabilidad Numerica' in nip:
             niplist.append(cedula)
-    if cone>=5:
-        try:
-            ##las siguientes lineas de codigo evaluan si el rechazo no pasa por el documento
-            element = driver.find_element('xpath','//*[@id="validationResponses"]/div[6]/div[2]/div[3]/div/div/div')
-            document= element.text
-            if document=="DOCUMENTO NO APLICA PARA ACTIVACIÓN POLIEDRO":
-                doclist.appen(cedula)
-        except:
-            print("documnto aplica")
-                
-    cone=0
+            cone=6
+    except:
+        print("el nip o min no presenta inconvenientes")
+       
+    
     while cone<6:
         try:
             #driver.find_element(By.XPATH, '//*[@id="btnNext"]').click()
@@ -180,6 +174,15 @@ def validaciones(doclist, niplist, operlist):
             #regresar
             cone+=1
             continue 
+    if cone>=5:
+        try:
+            ##las siguientes lineas de codigo evaluan si el rechazo no pasa por el documento
+            element = driver.find_element('xpath','//*[@id="validationResponses"]/div[6]/div[2]/div[3]/div/div/div')
+            document= element.text
+            if document=="DOCUMENTO NO APLICA PARA ACTIVACIÓN POLIEDRO":
+                doclist.appen(cedula)
+        except:
+            print("documnto aplica")
     if cone>=6:
         errorlist.append(cedula)  
         driver.find_element('xpath','//*[@id="DetailProduct_MinBroughtPortability"]').click()  
@@ -526,4 +529,6 @@ print("estos rechazos no pasaron por sim adquirida")
 print(simlist)
 print("los siguientes rechazos no se enviaron debido a que se necesita cambiar el numero a portar")
 print(numlist)
+print("los siguientes rechazos no pudieron ser enviados debido a que el min se encuentra en otro proceso ")
+print(niplist)
 print(" ONE CONTACT COLOMBIA ")
