@@ -153,7 +153,7 @@ def validaciones(doclist, niplist, operlist):
     try:
         nip=driver.find_element(By.XPATH,'//*[@id="validationResponses"]/div[5]/div[2]/div[11]/div/div[2]/div[1]')
         nip.click()
-        if 'El Min ingresado se encuentra en otra solicitud de Portabilidad numerica' in nip:
+        if 'El Min ingresado se encuentra en otra solicitud de Portabilidad Numerica' in nip:
             niplist.append(cedula)
     if cone>=5:
         try:
