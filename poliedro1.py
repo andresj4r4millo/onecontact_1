@@ -18,7 +18,8 @@ errorlist=[]
 doclist=[]
 niplist=[]
 operlist=[]
-
+simlist=[]
+numlist=[]
 #comentario
 dicplan={
     "WOM": '/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div/div[5]/div/div/div/div[2]/div[4]/fieldset/div[1]/span/span/input',
@@ -36,7 +37,7 @@ dicplan={
 
 
 
-def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist):
+def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,simlist):
     
     #primeros pasos, primer formulario
     #while con el fin de no lanzar error si el script no encuentra los elementos en la pagina
@@ -88,8 +89,14 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist):
             except:
                 cone+=1
                 continue
-
-
+    try:
+        sim_adquirida=driver.find_element(By.XPATH,'//*[@id="DetailProduct_MinBroughtPortability"]')
+        sim_adquirida.click()
+        simlist.append(cedula)
+        cone=10
+    except:
+        print("el elemento no se hizo presente ")
+    
     if cone>=10:
         driver.find_element('xpath',"/html/body/span/span/span[2]/ul/li[2]").click()
 
@@ -141,7 +148,23 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist):
 
     
 #ESTA FUNCION EVALUARA SI EL RECHAZO PASA O NO, Y EL PORQUE, PARA SEGMENTARLO POR LISTAS
-def validaciones(doclist, niplist, operlist):   
+def validaciones(doclist, niplist, operlist): 
+
+    try:
+        nip=driver.find_element(By.XPATH,'//*[@id="validationResponses"]/div[5]/div[2]/div[11]/div/div[2]/div[1]')
+        nip.click()
+        if 'El Min ingresado se encuentra en otra solicitud de Portabilidad numerica' in nip:
+            niplist.append(cedula)
+    if cone>=5:
+        try:
+            ##las siguientes lineas de codigo evaluan si el rechazo no pasa por el documento
+            element = driver.find_element('xpath','//*[@id="validationResponses"]/div[6]/div[2]/div[3]/div/div/div')
+            document= element.text
+            if document=="DOCUMENTO NO APLICA PARA ACTIVACIÓN POLIEDRO":
+                doclist.appen(cedula)
+        except:
+            print("documnto aplica")
+                
     cone=0
     while cone<6:
         try:
@@ -157,16 +180,6 @@ def validaciones(doclist, niplist, operlist):
             #regresar
             cone+=1
             continue 
-    if cone>=5:
-        try:
-            ##las siguientes lineas de codigo evaluan si el rechazo no pasa por el documento
-            element = driver.find_element('xpath','//*[@id="validationResponses"]/div[6]/div[2]/div[3]/div/div/div')
-            document= element.text
-            if document=="DOCUMENTO NO APLICA PARA ACTIVACIÓN POLIEDRO":
-                doclist.appen(cedula)
-        except:
-            print("documnto aplica")
-                
     if cone>=6:
         errorlist.append(cedula)  
         driver.find_element('xpath','//*[@id="DetailProduct_MinBroughtPortability"]').click()  
@@ -477,17 +490,17 @@ for row, datos in df.iterrows():
     try:
         inicio()
         time.sleep(1)
-        formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist)
+        formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,simlist)
         validaciones(doclist, niplist, operlist)
-        forms2(correo,plan,reglist,selleccion)
+        forms2(correo,plan,reglist,selleccion,numlist)
         contador=contador+1
     except:
         try:
             inicio()
             time.sleep(1)
-            formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist)
+            formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,simlist)
             validaciones(doclist, niplist, operlist)
-            forms2(correo,plan,reglist,selleccion)
+            forms2(correo,plan,reglist,selleccion,numlist)
             contador=contador+1
         except Exception as e:
             print(f"error al llenar el formulario {e}")
@@ -509,4 +522,8 @@ print("errores encontrados:")
 print(errorlist)
 print("los siguientes rechazos no pudieron ser enviados debido al documento: ")
 print(doclist)
+print("estos rechazos no pasaron por sim adquirida")
+print(simlist)
+print("los siguientes rechazos no se enviaron debido a que se necesita cambiar el numero a portar")
+print(numlist)
 print(" ONE CONTACT COLOMBIA ")
