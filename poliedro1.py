@@ -4,6 +4,7 @@ import time
 from selenium.webdriver.common.action_chains import ActionChains
 
 import pandas as pd
+import numpy as np
 from lxml import html
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -71,7 +72,8 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,s
                 driver.find_element('xpath','//*[@id="DetailProduct_PortabilityNumber"]').send_keys(celular)
                 #NIP //*[@id="DetailProduct_NIP"]
                 driver.find_element('xpath','//*[@id="DetailProduct_NIP"]').click()
-                driver.find_element('xpath','//*[@id="DetailProduct_NIP"]').send_keys(nip)
+                print(nip)
+                driver.find_element(By.XPATH,'//*[@id="DetailProduct_NIP"]').send_keys(nip)
                 #FECHA DE PORTACION
                 #driver.find_element('xpath','//*[@id="DetailProduct_PortabilityDate"]').clear()
                 #driver.find_element('xpath','//*[@id="DetailProduct_PortabilityDate"]').send_keys(fechap)
@@ -151,9 +153,9 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,s
 def validaciones(doclist, niplist, operlist): 
     cone=0
     try:
-        nip=driver.find_element(By.XPATH,'//*[@id="validationResponses"]/div[5]/div[2]/div[11]/div/div[2]/div[1]')
+        nipv=driver.find_element(By.XPATH,'//*[@id="validationResponses"]/div[5]/div[2]/div[11]/div/div[2]/div[1]')
         nip.click()
-        if 'El Min ingresado se encuentra en otra solicitud de Portabilidad Numerica' in nip:
+        if 'El Min ingresado se encuentra en otra solicitud de Portabilidad Numerica' in nipv:
             niplist.append(cedula)
             cone=6
     except:
@@ -168,7 +170,7 @@ def validaciones(doclist, niplist, operlist):
             time.sleep(2)
             driver.find_element(By.XPATH,'//*[@id="btnNext"]').click()
             time.sleep(3) 
-            driver.find_element('xpath','//*[@id="ActivationClass_CfmToFirstInvoice"]')
+            driver.find_element(By.XPATH,'//*[@id="ActivationClass_CfmToFirstInvoice"]')
             break
         except:
             #regresar
@@ -326,7 +328,7 @@ def forms2(correo,plan,reglist,selleccion,numlist):
  
     #PASOS PARA ENVIAR EL RECHAZO A LA BASE
     cone=0
-    while True:
+    while cone<=3:
         try:
             time.sleep(2)
             #CONTINUAR //*[@id="btnNext"]
@@ -336,22 +338,20 @@ def forms2(correo,plan,reglist,selleccion,numlist):
             time.sleep(4)
             #activar  
             driver.find_element('xpath','//*[@id="btnNext"]').click()
-            time.sleep(4)
-            #reglist.append(cedula)
-            #pasos finales 
-            driver.find_element('xpath','//*[@id="MsgModal"]/div/button[2]').click()
-            driver.find_element('xpath','//*[@id="btnPrev"]').click()
-            #driver.find_element('xpath','//*[@id="containerNavBar"]/ul/li[9]/a').click()
-            reglist.append(cedula)
-            print(f"rechazo enviado")
-            print(f"cedula: {cedula}")
+            time.sleep(2)
             break
         except:
             cone+=1
-        if cone>=3:
-            time.sleep(1)
-            break
-    time.sleep(1)
+
+    #pasos finales 
+    driver.find_element('xpath','//*[@id="MsgModal"]/div/button[2]').click()
+    #driver.find_element('xpath','//*[@id="btnPrev"]').click()
+    #driver.find_element('xpath','//*[@id="containerNavBar"]/ul/li[9]/a').click()
+    reglist.append(cedula)
+    print(f"rechazo enviado")
+    print(f"cedula: {cedula}")
+
+
     
 
 
@@ -428,6 +428,7 @@ fechap=(f"{dia}/{mes}/{año}")
 ####   AQUI INICIA EL PROCESO   ####
 driver = webdriver.Edge('msedgedriver.edge')
 df = pd.read_csv('BASEP.csv', encoding = 'latin-1')
+df.replace('nan', np.nan, inplace=True)
 df
 ingreso()
 paso="no"
@@ -439,6 +440,7 @@ if paso.upper()!="NO":
 activacion_pospago()
 contador=0
 iterador=1
+nipn=0
 for row, datos in df.iterrows():
     print(f"iteracion: {iterador}")
     iterador+=1
@@ -458,6 +460,8 @@ for row, datos in df.iterrows():
     operr=datos["OPERADOR"]
     operador=str(operr)
     convergencia=str(conver)
+
+    print(nipn)
     nip=str(nipn).rjust(5,"0")
     #condicion sellecion
     if convergencia=="SI" and operador=="WOM":
@@ -488,7 +492,7 @@ for row, datos in df.iterrows():
 
     
     cedulaa=str(cedul)
- 
+    
     #ciclo
     #EL CICLO SE REPITE EN CASO DE ERROR POR SI LOS ELEMENTOS DE LA PAGINA NO CARGAN Y SE GENERA ALGUN ERROR
     #  PARA NO PASAR POR ALTO EL REGISTRO
@@ -500,22 +504,18 @@ for row, datos in df.iterrows():
         forms2(correo,plan,reglist,selleccion,numlist)
         contador=contador+1
     except:
-        try:
-            inicio()
-            time.sleep(1)
-            formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,simlist)
-            validaciones(doclist, niplist, operlist)
-            forms2(correo,plan,reglist,selleccion,numlist)
-            contador=contador+1
-        except Exception as e:
-            print(f"error al llenar el formulario {e}")
-            errorlist.append(cedula)
+        inicio()
+        time.sleep(1)
+        formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,simlist)
+        validaciones(doclist, niplist, operlist)
+        forms2(correo,plan,reglist,selleccion,numlist)
+        contador=contador+1
     finally:
         time.sleep(1)
-        print("one contact")
-        
-    print(f"iteracion:{iterador}")
-    print(f"")
+        print("one contact")   
+    continue
+
+
 
      
 
