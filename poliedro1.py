@@ -432,6 +432,7 @@ df
 ingreso()
 paso="no"
 print("ya ingresaste a la pagina?")
+print("digite si de ser correcto: ")
 paso=input()
 if paso.upper()!="NO":
     print("ejecutando poliedro")
@@ -485,10 +486,9 @@ for row, datos in df.iterrows():
     cedula=str(cc)
     plan=str(planb)
 
-    if opc.upper()=="S":
-        cedulaa=str(cedul)
-    else:
-        cedulaa=str(cedulaaa)
+    
+    cedulaa=str(cedul)
+ 
     #ciclo
     #EL CICLO SE REPITE EN CASO DE ERROR POR SI LOS ELEMENTOS DE LA PAGINA NO CARGAN Y SE GENERA ALGUN ERROR
     #  PARA NO PASAR POR ALTO EL REGISTRO
@@ -513,6 +513,7 @@ for row, datos in df.iterrows():
     finally:
         time.sleep(1)
         print("one contact")
+        
     print(f"iteracion:{iterador}")
     print(f"")
 
