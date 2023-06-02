@@ -42,7 +42,7 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,s
     #primeros pasos, primer formulario
     #while con el fin de no lanzar error si el script no encuentra los elementos en la pagina
     cone=0
-    while cone<10:
+    while cone<6:
             print(f"iteracion: {str(cone)}")
             try:
                 #FORMULARIO 1
@@ -97,7 +97,7 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,s
     except:
         print("el elemento no se hizo presente ")
     
-    if cone>=10:
+    if cone>=6:
         driver.find_element('xpath',"/html/body/span/span/span[2]/ul/li[2]").click()
 
     #llenar los ultimos datos y dar click en el boton de realizar consulta
@@ -123,7 +123,7 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,s
             try:
                 accion = ActionChains(driver)
                 accion.double_click(driver.find_element('xpath','//*[@id="DetailProduct_SellerId"]')).perform()
-                driver.find_element('xpath','//*[@id="DetailProduct_SellerId"]').send_keys(cedulaa)
+                driver.find_element(By.XPATH,'//*[@id="DetailProduct_SellerId"]').send_keys(cedulaa)
                 time.sleep(1)
                 #driver.find_element('xpath','//*[@id="DetailProduct_PortabilityDate"]').clear()
                 #driver.find_element('xpath','//*[@id="DetailProduct_PortabilityDate"]').send_keys(fechap)
@@ -166,7 +166,7 @@ def validaciones(doclist, niplist, operlist):
             #time.sleep(2) 
             #driver.find_element(By.XPATH, '//*[@id="ActivationClass_CfmToFirstInvoice"]')
             time.sleep(2)
-            driver.find_element('xpath','//*[@id="btnNext"]').click()
+            driver.find_element(By.XPATH,'//*[@id="btnNext"]').click()
             time.sleep(3) 
             driver.find_element('xpath','//*[@id="ActivationClass_CfmToFirstInvoice"]')
             break
@@ -177,7 +177,7 @@ def validaciones(doclist, niplist, operlist):
     if cone>=5:
         try:
             ##las siguientes lineas de codigo evaluan si el rechazo no pasa por el documento
-            element = driver.find_element('xpath','//*[@id="validationResponses"]/div[6]/div[2]/div[3]/div/div/div')
+            element = driver.find_element(By.XPATH,'//*[@id="validationResponses"]/div[6]/div[2]/div[3]/div/div/div')
             document= element.text
             if document=="DOCUMENTO NO APLICA PARA ACTIVACIÓN POLIEDRO":
                 doclist.appen(cedula)
@@ -201,7 +201,7 @@ def forms2(correo,plan,reglist,selleccion,numlist):
         try:
             time.sleep(3)
             #CLASES DE ACTIVACION //*[@id="ActivationClass_CfmToFirstInvoice"]
-            driver.find_element('xpath','//*[@id="ActivationClass_CfmToFirstInvoice"]').click()
+            driver.find_element(By.XPATH,'//*[@id="ActivationClass_CfmToFirstInvoice"]').click()
             driver.find_element('xpath','//*[@id="ActivationClass_LinkPreactivation"]').click()
             #CORREO DEL CLIENTE //*[@id="PersonalInfo_Email"]
             driver.find_element('xpath','//*[@id="PersonalInfo_Email"]').clear()
@@ -250,7 +250,7 @@ def forms2(correo,plan,reglist,selleccion,numlist):
     cone=0
     while cone<=4:
         try:           
-            driver.find_element('xpath','//*[@id="btnNext"]').click()
+            driver.find_element(By.XPATH,'//*[@id="btnNext"]').click()
             time.sleep(3)
             driver.find_element('xpath','//*[@id="select2-EquipmentPlanDataViewModel_MobileEquipment-container"]')
             break
@@ -281,9 +281,10 @@ def forms2(correo,plan,reglist,selleccion,numlist):
 
     cone=0
     while cone<=6:
+
         try:
             #modelo
-            driver.find_element('xpath','//*[@id="select2-EquipmentPlanDataViewModel_MobileEquipment-container"]').click()
+            driver.find_element(By.XPATH,'//*[@id="select2-EquipmentPlanDataViewModel_MobileEquipment-container"]').click()
             time.sleep(2)
             driver.find_element('xpath',"/html/body/span/span/span[1]/input").send_keys("MOTOROLA")
             time.sleep(3)
@@ -302,6 +303,7 @@ def forms2(correo,plan,reglist,selleccion,numlist):
             time.sleep(1)
             cone+=1
     #para generar error en caso de que la pagina no cargue ningun elemento
+
     if  cone>=6:
         numlist.append(cedula)
         driver.find_element('xpath','//*[@id="DetailProduct_MinBroughtPortability"]').click()
@@ -311,7 +313,7 @@ def forms2(correo,plan,reglist,selleccion,numlist):
     while True:
         try:
             time.sleep(4)
-            driver.find_element('xpath',selleccion).click()
+            driver.find_element(By.XPATH,selleccion).click()
             time.sleep(2)
             #CONTINUAR //*[@id="btnNext"]
             driver.find_element('xpath','//*[@id="btnNext"]').click()
@@ -328,7 +330,7 @@ def forms2(correo,plan,reglist,selleccion,numlist):
         try:
             time.sleep(2)
             #CONTINUAR //*[@id="btnNext"]
-            driver.find_element('xpath','//*[@id="btnNext"]').click()
+            driver.find_element(By.XPATH,'//*[@id="btnNext"]').click()
             time.sleep(3)
             driver.find_element('xpath','//*[@id="MsgModal"]/div/button[2]').click()
             time.sleep(4)
