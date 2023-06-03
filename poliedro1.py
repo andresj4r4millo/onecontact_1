@@ -342,14 +342,15 @@ def forms2(correo,plan,reglist,selleccion,numlist):
             break
         except:
             cone+=1
-
+    print(f"rechazo enviado")
+    print(f"cedula: {cedula}")
+    reglist.append(cedula)
     #pasos finales 
     driver.find_element('xpath','//*[@id="MsgModal"]/div/button[2]').click()
     #driver.find_element('xpath','//*[@id="btnPrev"]').click()
-    #driver.find_element('xpath','//*[@id="containerNavBar"]/ul/li[9]/a').click()
-    reglist.append(cedula)
-    print(f"rechazo enviado")
-    print(f"cedula: {cedula}")
+    driver.find_element('xpath','//*[@id="containerNavBar"]/ul/li[9]/a').click()
+    
+    
 
 
     
@@ -461,7 +462,6 @@ for row, datos in df.iterrows():
     operador=str(operr)
     convergencia=str(conver)
 
-    print(nipn)
     nip=str(nipn).rjust(5,"0")
     #condicion sellecion
     if convergencia=="SI" and operador=="WOM":
