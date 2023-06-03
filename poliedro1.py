@@ -235,7 +235,7 @@ def forms2(correo,plan,reglist,selleccion,numlist):
     #pospago boton de seleccion
     buton=driver.find_element(By.XPATH,'//*[@id="PersonalInfo_ProductDonorOperator"]')  
     time.sleep(2)
-    
+
     while True:
         try:
             driver.find_element(By.XPATH,'//*[@id="PersonalInfo_ProductDonorOperator"]').click()
@@ -350,8 +350,17 @@ def forms2(correo,plan,reglist,selleccion,numlist):
     button = modal.find_element(By.XPATH,'//*[@id="MsgModal"]/div/button[2]')
     button.click()
     driver.switch_to.default_content()
-    #driver.find_element('xpath','//*[@id="btnPrev"]').click()
-    driver.find_element('xpath','containerNavBar').click()
+    #driver.find_element('xpath','//*[@id="btnPrev"]').click() //*[@id="btnPrev"]
+    cone=0
+    while cone<=3:
+        try:
+            driver.find_element(By.XPATH,'//*[@id="btnPrev"]').click()
+            break
+        except:
+            cone+=1
+    if cone>=3:
+        driver.find_element(By.XPATH,'//*[@id="btnPrev"]').click()
+    
     
     
 
