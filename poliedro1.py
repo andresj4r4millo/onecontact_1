@@ -39,7 +39,7 @@ dicplan={
 
 
 def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,simlist):
-    
+    error="no"
     #primeros pasos, primer formulario
     #while con el fin de no lanzar error si el script no encuentra los elementos en la pagina
     cone=0
@@ -72,7 +72,6 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,s
                 driver.find_element('xpath','//*[@id="DetailProduct_PortabilityNumber"]').send_keys(celular)
                 #NIP //*[@id="DetailProduct_NIP"]
                 driver.find_element('xpath','//*[@id="DetailProduct_NIP"]').click()
-                print(nip)
                 driver.find_element(By.XPATH,'//*[@id="DetailProduct_NIP"]').send_keys(nip)
                 #FECHA DE PORTACION
                 #driver.find_element('xpath','//*[@id="DetailProduct_PortabilityDate"]').clear()
@@ -86,18 +85,12 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,s
                 # /html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div[2]/div[1]/div[2]/div[2]/div/input
                 accion.double_click(driver.find_element('xpath',"/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div[2]/div[1]/div[2]/div[2]/div/input")).perform()
                 driver.find_element('xpath',"/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div[2]/div[1]/div[2]/div[2]/div/input").send_keys(serialsim)
-
+                
                 break
             except:
                 cone+=1
                 continue
-    try:
-        sim_adquirida=driver.find_element(By.XPATH,'//*[@id="DetailProduct_MinBroughtPortability"]')
-        sim_adquirida.click()
-        simlist.append(cedula)
-        cone=10
-    except:
-        print("el elemento no se hizo presente ")
+    
     
     if cone>=6:
         driver.find_element('xpath',"/html/body/span/span/span[2]/ul/li[2]").click()
@@ -121,8 +114,20 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,s
     except:
         #SI LA CONSULTA NO SE REALIZA EL SIGUIENTE BUCLE DIGITA NUEVAMENTE LA CEDULA DEL ASESOR, LA FECHA Y REALIZA LA CONSULTA HASTA QUE SE REDIRIGA AL SISGUIENTE FORM
         cone=0
+        
         while cone<6:
+
             try:
+                try:
+                    sim_adquirida=driver.find_element(By.XPATH,'//*[@id="DetailProduct_MinBroughtPortability"]')
+                    sim_adquirida.click()
+                    simlist.append(cedula)
+                    #cone=10
+                    print("sim adquirida")
+                    error="si"
+                    break
+                except:
+                    print("sim no adquirida")  
                 accion = ActionChains(driver)
                 accion.double_click(driver.find_element('xpath','//*[@id="DetailProduct_SellerId"]')).perform()
                 driver.find_element(By.XPATH,'//*[@id="DetailProduct_SellerId"]').send_keys(cedulaa)
@@ -133,6 +138,7 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,s
                 driver.execute_script(f'document.getElementById("DetailProduct_PortabilityDate").value = "{fechap}";')
                 #driver.find_element('xpath','//*[@id="DetailProduct_PortabilityDate"]').send_keys(Keys.ENTER)
                 #time.sleep(1)
+
                 driver.find_element('xpath','//*[@id="btnNext"]').click()
                 ##FORMULARIO 2    
                 time.sleep(3)
@@ -140,28 +146,18 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,s
                 break
             except:
                 cone+=1
-                if cone>=5:
-                    errorlist.append(cedula)
-                    break
+
     #ESTAS LINEAS DE CODIGO GENERARAN ERROR SI LA PAGINA NO REALIZA LA CONSULTA DESPUES DE 6 INTENTOS
     if cone>=6:
         driver.find_element('xpath','//*[@id="DetailProduct_MinBroughtPortability"]').click()
+        errorlist.append(cedula)
+
     
 
     
 #ESTA FUNCION EVALUARA SI EL RECHAZO PASA O NO, Y EL PORQUE, PARA SEGMENTARLO POR LISTAS
 def validaciones(doclist, niplist, operlist): 
     cone=0
-    try:
-        nipv=driver.find_element(By.XPATH,'//*[@id="validationResponses"]/div[5]/div[2]/div[11]/div/div[2]/div[1]')
-        nip.click()
-        if 'El Min ingresado se encuentra en otra solicitud de Portabilidad Numerica' in nipv:
-            niplist.append(cedula)
-            cone=6
-    except:
-        print("el nip o min no presenta inconvenientes")
-       
-    
     while cone<6:
         try:
             #driver.find_element(By.XPATH, '//*[@id="btnNext"]').click()
@@ -239,6 +235,7 @@ def forms2(correo,plan,reglist,selleccion,numlist):
     #pospago boton de seleccion
     buton=driver.find_element(By.XPATH,'//*[@id="PersonalInfo_ProductDonorOperator"]')  
     time.sleep(2)
+    
     while True:
         try:
             driver.find_element(By.XPATH,'//*[@id="PersonalInfo_ProductDonorOperator"]').click()
@@ -315,7 +312,7 @@ def forms2(correo,plan,reglist,selleccion,numlist):
     while True:
         try:
             time.sleep(4)
-            driver.find_element(By.XPATH,selleccion).click()
+            driver.find_element('xpath',selleccion).click()
             time.sleep(2)
             #CONTINUAR //*[@id="btnNext"]
             driver.find_element('xpath','//*[@id="btnNext"]').click()
@@ -346,9 +343,15 @@ def forms2(correo,plan,reglist,selleccion,numlist):
     print(f"cedula: {cedula}")
     reglist.append(cedula)
     #pasos finales 
-    driver.find_element('xpath','//*[@id="MsgModal"]/div/button[2]').click()
+    time.sleep(6)
+    modal = WebDriverWait(driver, 10).until(
+    EC.presence_of_element_located((By.ID, "MsgModal"))
+    )
+    button = modal.find_element(By.XPATH,'//*[@id="MsgModal"]/div/button[2]')
+    button.click()
+    driver.switch_to.default_content()
     #driver.find_element('xpath','//*[@id="btnPrev"]').click()
-    driver.find_element('xpath','//*[@id="containerNavBar"]/ul/li[9]/a').click()
+    driver.find_element('xpath','containerNavBar').click()
     
     
 
@@ -504,12 +507,15 @@ for row, datos in df.iterrows():
         forms2(correo,plan,reglist,selleccion,numlist)
         contador=contador+1
     except:
-        inicio()
-        time.sleep(1)
-        formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,simlist)
-        validaciones(doclist, niplist, operlist)
-        forms2(correo,plan,reglist,selleccion,numlist)
-        contador=contador+1
+        try:
+            inicio()
+            time.sleep(1)
+            formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,simlist)
+            validaciones(doclist, niplist, operlist)
+            forms2(correo,plan,reglist,selleccion,numlist)
+            contador=contador+1
+        except:
+            continue
     finally:
         time.sleep(1)
         print("one contact")   
