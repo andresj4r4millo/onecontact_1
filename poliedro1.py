@@ -118,16 +118,6 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,s
         while cone<6:
 
             try:
-                try:
-                    sim_adquirida=driver.find_element(By.XPATH,'//*[@id="DetailProduct_MinBroughtPortability"]')
-                    sim_adquirida.click()
-                    simlist.append(cedula)
-                    #cone=10
-                    print("sim adquirida")
-                    error="si"
-                    break
-                except:
-                    print("sim no adquirida")  
                 accion = ActionChains(driver)
                 accion.double_click(driver.find_element('xpath','//*[@id="DetailProduct_SellerId"]')).perform()
                 driver.find_element(By.XPATH,'//*[@id="DetailProduct_SellerId"]').send_keys(cedulaa)
@@ -138,12 +128,20 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,s
                 driver.execute_script(f'document.getElementById("DetailProduct_PortabilityDate").value = "{fechap}";')
                 #driver.find_element('xpath','//*[@id="DetailProduct_PortabilityDate"]').send_keys(Keys.ENTER)
                 #time.sleep(1)
+                try:
+                    sim_adquirida=driver.find_element(By.XPATH,'//*[@id="DetailProduct_MinBroughtPortability"]')
+                    sim_adquirida.click()
+                    simlist.append(cedula)
+                    print("sim adquirida")
+                    cone=6
+                    break
+                except:
 
-                driver.find_element('xpath','//*[@id="btnNext"]').click()
-                ##FORMULARIO 2    
-                time.sleep(3)
-                driver.find_element('xpath','/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div/div[5]/div[2]/div[11]/div/div[2]/div[2]/div').click()
-                break
+                    driver.find_element('xpath','//*[@id="btnNext"]').click()
+                    ##FORMULARIO 2    
+                    time.sleep(3)
+                    driver.find_element('xpath','/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div/div[5]/div[2]/div[11]/div/div[2]/div[2]/div').click()
+                    break
             except:
                 cone+=1
 
