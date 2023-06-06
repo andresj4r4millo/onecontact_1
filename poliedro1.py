@@ -307,6 +307,7 @@ def forms2(correo,plan,reglist,selleccion,numlist):
 
     #SELECCIONAR CAMPAÑA DE BENEFICIOS  
     paso="no"
+    cone=0
     while True:
         try:
             time.sleep(4)
@@ -318,7 +319,8 @@ def forms2(correo,plan,reglist,selleccion,numlist):
             paso="si"
         except:
             paso="no" 
-        if paso=="si":
+            cone+=1
+        if paso=="si" or cone>=6:
             break
  
     #PASOS PARA ENVIAR EL RECHAZO A LA BASE
