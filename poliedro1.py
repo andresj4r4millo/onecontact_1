@@ -203,18 +203,23 @@ def forms2(correo,plan,reglist,selleccion,numlist):
             driver.find_element('xpath','//*[@id="PersonalInfo_Email"]').clear()
             driver.find_element('xpath','//*[@id="PersonalInfo_Email"]').send_keys(correo)
             time.sleep(1)
-            #NUMERO DE TELEFONO 
+            #NUMERO DE TELEFONO //*[@id="select2-PhoneId-container"]
             driver.find_element('xpath','//*[@id="select2-PhoneId-container"]').click()
             time.sleep(1)
-            driver.find_element('xpath',"/html/body/span/span/span[2]/ul/li[1]").click()
-            time.sleep(2)
+            #escribir nuevo: 
+            driver.find_element(By.XPATH,"/html/body/span/span/span[1]/input").send_keys("NUEVO")
+            driver.find_element(By.XPATH,"/html/body/span/span/span[1]/input").send_keys(Keys.ENTER)
+            time.sleep(1)
+            #//*[@id="select2-PhoneClass-container"] TIPO
             driver.find_element('xpath','//*[@id="select2-PhoneClass-container"]').click()
-            time.sleep(2)
-            driver.find_element('xpath',"/html/body/span/span/span[2]/ul/li[2]").click()
-            time.sleep(2)
-            driver.find_element('xpath','//*[@id="select2-Prefix-container"]').click()
-            time.sleep(2)
-            driver.find_element('xpath',"/html/body/span/span/span[2]/ul/li[2]").click()
+            time.sleep(1)
+            driver.find_element('xpath','/html/body/span/span/span[1]/input').send_keys("FIJO")#FIJO
+            driver.find_element(By.XPATH,"/html/body/span/span/span[1]/input").send_keys(Keys.ENTER)
+            #INDICATIVO
+            driver.find_element(By.XPATH,'//*[@id="select2-Prefix-container"]').click()
+            time.sleep(1)
+            driver.find_element('xpath','/html/body/span/span/span[1]/input').send_keys("1")#tipo
+            driver.find_element(By.XPATH,"/html/body/span/span/span[1]/input").send_keys(Keys.ENTER)
             time.sleep(1)
             accion = ActionChains(driver)
             accion.double_click(driver.find_element('xpath','//*[@id="PhoneNumber"]')).perform()
@@ -230,9 +235,8 @@ def forms2(correo,plan,reglist,selleccion,numlist):
     if cone>=4:
         driver.find_element('xpath','//*[@id="DetailProduct_Iccid"]').click()
         print("eror al diligenciar campos")
-    cone=0
+    
     #pospago boton de seleccion
-      
     time.sleep(2)
     while True:
         try:
