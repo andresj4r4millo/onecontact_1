@@ -117,7 +117,7 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,s
         #SI LA CONSULTA NO SE REALIZA EL SIGUIENTE BUCLE DIGITA NUEVAMENTE LA CEDULA DEL ASESOR, LA FECHA Y REALIZA LA CONSULTA HASTA QUE SE REDIRIGA AL SISGUIENTE FORM
         cone=0
         
-        while cone<6:
+        while cone<8:
 
             try:
                 accion = ActionChains(driver)
@@ -148,7 +148,7 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,s
                 cone+=1
 
     #ESTAS LINEAS DE CODIGO GENERARAN ERROR SI LA PAGINA NO REALIZA LA CONSULTA DESPUES DE 6 INTENTOS
-    if cone>=6:
+    if cone>=8:
         driver.find_element('xpath','//*[@id="DetailProduct_MinBroughtPortability"]').click()
         errorlist.append(cedula)
 
@@ -159,7 +159,7 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,s
 def validaciones(doclist, niplist, operlist): 
 
     cone=0
-    while cone<6:
+    while cone<7:
         try:
             #driver.find_element(By.XPATH, '//*[@id="btnNext"]').click()
             #time.sleep(2) 
@@ -173,7 +173,7 @@ def validaciones(doclist, niplist, operlist):
             #regresar
             cone+=1
             continue 
-    if cone>=5:
+    if cone>=6:
         try:
             v_nip=driver.find_element(By.XPATH,'//*[@id="validationResponses"]/div[5]/div[2]/div[11]/div/div[2]/div[1]/div')
             if "EL NIP NO SE ENCUENTRA VIGENTE" in v_nip:
@@ -209,30 +209,50 @@ def forms2(correo,plan,reglist,selleccion,numlist,minimo):
             driver.find_element('xpath','//*[@id="PersonalInfo_Email"]').clear()
             driver.find_element('xpath','//*[@id="PersonalInfo_Email"]').send_keys(correo)
             time.sleep(1)
-            #NUMERO DE TELEFONO //*[@id="select2-PhoneId-container"]
-            driver.find_element('xpath','//*[@id="select2-PhoneId-container"]').click()
-            time.sleep(1)
-            #escribir nuevo: 
-            driver.find_element(By.XPATH,"/html/body/span/span/span[1]/input").send_keys("NUEVO")
-            driver.find_element(By.XPATH,"/html/body/span/span/span[1]/input").send_keys(Keys.ENTER)
-            time.sleep(1)
-            #//*[@id="select2-PhoneClass-container"] TIPO
-            driver.find_element('xpath','//*[@id="select2-PhoneClass-container"]').click()
-            time.sleep(1)
-            driver.find_element('xpath','/html/body/span/span/span[1]/input').send_keys("FIJO")#FIJO
-            driver.find_element(By.XPATH,"/html/body/span/span/span[1]/input").send_keys(Keys.ENTER)
-            #INDICATIVO
-            driver.find_element(By.XPATH,'//*[@id="select2-Prefix-container"]').click()
-            time.sleep(1)
-            driver.find_element('xpath','/html/body/span/span/span[1]/input').send_keys("1")#tipo
-            driver.find_element(By.XPATH,"/html/body/span/span/span[1]/input").send_keys(Keys.ENTER)
-            time.sleep(1)
-            accion = ActionChains(driver)
-            accion.double_click(driver.find_element('xpath','//*[@id="PhoneNumber"]')).perform()
-            time.sleep(1)
-            driver.find_element('xpath','//*[@id="PhoneNumber"]').send_keys(1111111)
-            time.sleep(1)
-            #INFORMACION DE PORTABILIDAD
+            #NUMERO DE TELEFONO 
+            driver.find_element(By.XPATH,'//*[@id="select2-PhoneId-container"]').click() #//*[@id="select2-PhoneId-container"]
+
+            try:
+
+                #escribir nuevo: 
+                driver.find_element(By.XPATH,"/html/body/span/span/span[1]/input").send_keys("NUEVO")#/html/body/span/span/span[1]/input
+                driver.find_element(By.XPATH,"/html/body/span/span/span[1]/input").send_keys(Keys.ENTER)
+                time.sleep(1)
+                #//*[@id="select2-PhoneClass-container"] TIPO
+                driver.find_element('xpath','//*[@id="select2-PhoneClass-container"]').click()
+                time.sleep(1)
+                driver.find_element('xpath','/html/body/span/span/span[1]/input').send_keys("FIJO")#FIJO
+                driver.find_element(By.XPATH,"/html/body/span/span/span[1]/input").send_keys(Keys.ENTER)
+                #INDICATIVO
+                driver.find_element(By.XPATH,'//*[@id="select2-Prefix-container"]').click()
+                time.sleep(1)
+                driver.find_element('xpath','/html/body/span/span/span[1]/input').send_keys("1")#tipo
+                driver.find_element(By.XPATH,"/html/body/span/span/span[1]/input").send_keys(Keys.ENTER)
+                time.sleep(1)
+                accion = ActionChains(driver)
+                accion.double_click(driver.find_element('xpath','//*[@id="PhoneNumber"]')).perform()
+                time.sleep(1)
+                driver.find_element('xpath','//*[@id="PhoneNumber"]').send_keys(1111111)
+                time.sleep(1)
+                
+            except:
+
+                driver.find_element('xpath','//*[@id="select2-PhoneId-results"]/li[1]').click()#//*[@id="select2-PhoneId-results"]/li[1]
+                time.sleep(2)
+                driver.find_element('xpath','//*[@id="select2-PhoneClass-container"]').click()#//*[@id="select2-PhoneClass-container"]
+                time.sleep(2)
+                driver.find_element('xpath','//*[@id="DetailPhone_PersonalInfo"]/fieldset/div/div[3]/label').click()#//*[@id="DetailPhone_PersonalInfo"]/fieldset/div/div[3]/label
+                time.sleep(2)
+                driver.find_element('xpath','//*[@id="select2-Prefix-container"]').click()
+                time.sleep(2)
+                driver.find_element('xpath',"/html/body/span/span/span[2]/ul/li[2]").click()
+                time.sleep(1)
+                accion = ActionChains(driver)
+                accion.double_click(driver.find_element('xpath','//*[@id="PhoneNumber"]')).perform()
+                time.sleep(1)
+                driver.find_element('xpath','//*[@id="PhoneNumber"]').send_keys(1111111)
+                time.sleep(1)
+                #INFORMACION DE PORTABILIDAD
             break
         except:
             cone+=1
