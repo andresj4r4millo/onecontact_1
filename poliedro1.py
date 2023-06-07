@@ -228,12 +228,12 @@ def forms2(correo,plan,reglist,selleccion,numlist):
             continue
     #para generar error en caso de que los elementos no se hagan presentes
     if cone>=4:
-        driver.find_element('xpath','//*[@id="DetailProduct_MinBroughtPortability"]').click()
+        driver.find_element('xpath','//*[@id="DetailProduct_Iccid"]').click()
+        print("eror al diligenciar campos")
     cone=0
     #pospago boton de seleccion
-    buton=driver.find_element(By.XPATH,'//*[@id="PersonalInfo_ProductDonorOperator"]')  
+      
     time.sleep(2)
-
     while True:
         try:
             driver.find_element(By.XPATH,'//*[@id="PersonalInfo_ProductDonorOperator"]').click()
@@ -263,6 +263,7 @@ def forms2(correo,plan,reglist,selleccion,numlist):
                 time.sleep(1)
                 driver.find_element('xpath','//*[@id="PhoneNumber"]').send_keys(1111111)
                 time.sleep(1)
+                buton=driver.find_element(By.XPATH,'//*[@id="PersonalInfo_ProductDonorOperator"]')
                 if buton.is_selected():
                     driver.find_element('xpath','//*[@id="btnNext"]').click()
                 else:
