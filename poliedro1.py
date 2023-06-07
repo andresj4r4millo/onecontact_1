@@ -21,6 +21,8 @@ niplist=[]
 operlist=[]
 simlist=[]
 numlist=[]
+minimo=[]
+
 #comentario
 dicplan={
     "WOM": '/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div/div[5]/div/div/div/div[2]/div[4]/fieldset/div[1]/span/span/input',
@@ -155,6 +157,7 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,s
     
 #ESTA FUNCION EVALUARA SI EL RECHAZO PASA O NO, Y EL PORQUE, PARA SEGMENTARLO POR LISTAS
 def validaciones(doclist, niplist, operlist): 
+
     cone=0
     while cone<6:
         try:
@@ -172,6 +175,9 @@ def validaciones(doclist, niplist, operlist):
             continue 
     if cone>=5:
         try:
+            v_nip=driver.find_element(By.XPATH,'//*[@id="validationResponses"]/div[5]/div[2]/div[11]/div/div[2]/div[1]/div')
+            if "EL NIP NO SE ENCUENTRA VIGENTE" in v_nip:
+                niplist.append(cedula)
             ##las siguientes lineas de codigo evaluan si el rechazo no pasa por el documento
             element = driver.find_element(By.XPATH,'//*[@id="validationResponses"]/div[6]/div[2]/div[3]/div/div/div')
             document= element.text
@@ -191,7 +197,7 @@ def validaciones(doclist, niplist, operlist):
 
 
 
-def forms2(correo,plan,reglist,selleccion,numlist):
+def forms2(correo,plan,reglist,selleccion,numlist,minimo):
     cone=0
     while cone<=4:
         try:
@@ -344,6 +350,12 @@ def forms2(correo,plan,reglist,selleccion,numlist):
             break
         except:
             cone+=1
+    if cone>=3:
+        driver.find_element(By.XPATH,'//*[@id="btnPrev"]').click()
+        time.sleep(1)
+        driver.find_element('xpath','//*[@id="PhoneNumber"]').click()
+        minimo.append(cedula)
+
     print(f"rechazo enviado")
     print(f"cedula: {cedula}")
     reglist.append(cedula)
@@ -518,7 +530,7 @@ for row, datos in df.iterrows():
         time.sleep(1)
         formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,simlist)
         validaciones(doclist, niplist, operlist)
-        forms2(correo,plan,reglist,selleccion,numlist)
+        forms2(correo,plan,reglist,selleccion,numlist,minimo)
         contador=contador+1
     except:
         try:
@@ -526,7 +538,7 @@ for row, datos in df.iterrows():
             time.sleep(1)
             formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,simlist)
             validaciones(doclist, niplist, operlist)
-            forms2(correo,plan,reglist,selleccion,numlist)
+            forms2(correo,plan,reglist,selleccion,numlist,minimo)
             contador=contador+1
         except:
             continue
@@ -554,4 +566,6 @@ print("los siguientes rechazos no se enviaron debido a que se necesita cambiar e
 print(numlist)
 print("los siguientes rechazos no pudieron ser enviados debido a que el min se encuentra en otro proceso ")
 print(niplist)
+print("los siguientes rechazos no pasaron por pago minimo")
+print(minimo)
 print(" ONE CONTACT COLOMBIA ")
