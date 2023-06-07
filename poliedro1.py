@@ -210,9 +210,10 @@ def forms2(correo,plan,reglist,selleccion,numlist,minimo):
             driver.find_element('xpath','//*[@id="PersonalInfo_Email"]').send_keys(correo)
             time.sleep(1)
             #NUMERO DE TELEFONO 
-            driver.find_element(By.XPATH,'//*[@id="select2-PhoneId-container"]').click() #//*[@id="select2-PhoneId-container"]
-
-            try:
+            div_info=driver.find_element(By.XPATH,'group_4')
+            nuevo=driver.find_element(By.XPATH,'//*[@id="select2-PhoneId-container"]').click() #//*[@id="select2-PhoneId-container"]
+            if nuevo in div_info:
+                nuevo.click()
 
                 #escribir nuevo: 
                 driver.find_element(By.XPATH,"/html/body/span/span/span[1]/input").send_keys("NUEVO")#/html/body/span/span/span[1]/input
@@ -233,10 +234,9 @@ def forms2(correo,plan,reglist,selleccion,numlist,minimo):
                 accion.double_click(driver.find_element('xpath','//*[@id="PhoneNumber"]')).perform()
                 time.sleep(1)
                 driver.find_element('xpath','//*[@id="PhoneNumber"]').send_keys(1111111)
-                time.sleep(1)
-                
-            except:
-
+                time.sleep(1)    
+            else:
+                driver.find_element(By.XPATH,'//*[@id="PhoneId"]').click()
                 driver.find_element('xpath','//*[@id="select2-PhoneId-results"]/li[1]').click()#//*[@id="select2-PhoneId-results"]/li[1]
                 time.sleep(2)
                 driver.find_element('xpath','//*[@id="select2-PhoneClass-container"]').click()#//*[@id="select2-PhoneClass-container"]
