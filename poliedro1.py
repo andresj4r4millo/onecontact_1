@@ -214,7 +214,6 @@ def forms2(correo,plan,reglist,selleccion,numlist,minimo):
             nuevo=driver.find_element(By.XPATH,'//*[@id="select2-PhoneId-container"]').click() #//*[@id="select2-PhoneId-container"]
             if nuevo in div_info:
                 nuevo.click()
-
                 #escribir nuevo: 
                 driver.find_element(By.XPATH,"/html/body/span/span/span[1]/input").send_keys("NUEVO")#/html/body/span/span/span[1]/input
                 driver.find_element(By.XPATH,"/html/body/span/span/span[1]/input").send_keys(Keys.ENTER)
@@ -237,11 +236,13 @@ def forms2(correo,plan,reglist,selleccion,numlist,minimo):
                 time.sleep(1)    
             else:
                 driver.find_element(By.XPATH,'//*[@id="PhoneId"]').click()
-                driver.find_element('xpath','//*[@id="select2-PhoneId-results"]/li[1]').click()#//*[@id="select2-PhoneId-results"]/li[1]
+                driver.find_element('xpath','//*[@id="select2-PhoneId-container"]').click()
+                time.sleep(1)
+                driver.find_element('xpath',"/html/body/span/span/span[2]/ul/li[1]").click()
                 time.sleep(2)
-                driver.find_element('xpath','//*[@id="select2-PhoneClass-container"]').click()#//*[@id="select2-PhoneClass-container"]
+                driver.find_element('xpath','//*[@id="select2-PhoneClass-container"]').click()
                 time.sleep(2)
-                driver.find_element('xpath','//*[@id="DetailPhone_PersonalInfo"]/fieldset/div/div[3]/label').click()#//*[@id="DetailPhone_PersonalInfo"]/fieldset/div/div[3]/label
+                driver.find_element('xpath',"/html/body/span/span/span[2]/ul/li[2]").click()
                 time.sleep(2)
                 driver.find_element('xpath','//*[@id="select2-Prefix-container"]').click()
                 time.sleep(2)
@@ -251,7 +252,6 @@ def forms2(correo,plan,reglist,selleccion,numlist,minimo):
                 accion.double_click(driver.find_element('xpath','//*[@id="PhoneNumber"]')).perform()
                 time.sleep(1)
                 driver.find_element('xpath','//*[@id="PhoneNumber"]').send_keys(1111111)
-                time.sleep(1)
                 #INFORMACION DE PORTABILIDAD
             break
         except:
@@ -496,14 +496,11 @@ for row, datos in df.iterrows():
     iterador+=1
     cc=datos["CEDULA"]
     apellido=datos["APELLIDO"]
-    cedulaaa=datos["CEDULAASESOR"]
     ##celular
     celular=datos["MIN_AP"]
     nipn=datos["NIP"]
-    fecha=datos["FECHA_P"]
     serialsim=datos["SERIAL_SIM"]
     ##celular: no usar, valor ==0
-    minpre=datos["MIN_PRE"]
     correo=datos["CORREO"]
     planb=datos["PLAN"]
     conver=datos["CONVERGENCIA"] 
