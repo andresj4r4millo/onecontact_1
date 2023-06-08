@@ -214,7 +214,7 @@ def forms2(correo,plan,reglist,selleccion,numlist,minimo):
             nuevo=driver.find_element(By.XPATH,'//*[@id="phoneSectionBill"]/div[1]/div/span/span[1]')
             phone=driver.find_element(By.ID,'select2-PhoneId-container')
              #//*[@id="select2-PhoneId-container"]
-            if nuevo in div_info:
+            if nuevo in div_info.text:
                 nuevo.click()
                 #escribir nuevo: 
                 driver.find_element(By.XPATH,"/html/body/span/span/span[1]/input").send_keys("NUEVO")#/html/body/span/span/span[1]/input
@@ -236,7 +236,7 @@ def forms2(correo,plan,reglist,selleccion,numlist,minimo):
                 time.sleep(1)
                 driver.find_element('xpath','//*[@id="PhoneNumber"]').send_keys(1111111)
                 time.sleep(1)    
-            elif phone in div_info:
+            elif phone in div_info.text:
                 phone.click.click()
                 driver.find_element('xpath','//*[@id="select2-PhoneId-container"]').click()
                 time.sleep(1)
