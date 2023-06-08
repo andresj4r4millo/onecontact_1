@@ -210,7 +210,7 @@ def forms2(correo,plan,reglist,selleccion,numlist,minimo):
             driver.find_element('xpath','//*[@id="PersonalInfo_Email"]').send_keys(correo)
             time.sleep(1)
             #NUMERO DE TELEFONO 
-            div_info=driver.find_element(By.ID,'group_4')
+            div_info=driver.find_elements(By.ID,'group_4')
             nuevo=driver.find_element(By.XPATH,'//*[@id="phoneSectionBill"]/div[1]/div/span/span[1]')
             phone=driver.find_element(By.ID,'select2-PhoneId-container')
              #//*[@id="select2-PhoneId-container"]
