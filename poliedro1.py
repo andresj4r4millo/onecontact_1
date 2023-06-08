@@ -212,11 +212,12 @@ def forms2(correo,plan,reglist,selleccion,numlist,minimo):
             #NUMERO DE TELEFONO 
             div_info=driver.find_element(By.ID,'group_4')
             print(div_info.text)
-            nuevo=driver.find_element(By.XPATH,'//*[@id="select2-PhoneId-container"]')
+            #nuevo=driver.find_element(By.XPATH,'//*[@id="select2-PhoneId-container"]')
             phone=driver.find_element(By.XPATH,'//*[@id="PhoneId"]')
             #//*[@id="select2-PhoneId-container"]
-            div_info_id = div_info.get_attribute("id")
-            if div_info_id == "group_4" and nuevo.text == "Nuevo...":
+
+            try:
+                nuevo = div_info.find_element(By.ID,'group_4')
                 nuevo.click()
                 #escribir nuevo: 
                 driver.find_element(By.XPATH,"/html/body/span/span/span[1]/input").send_keys("NUEVO")#/html/body/span/span/span[1]/input
@@ -236,9 +237,10 @@ def forms2(correo,plan,reglist,selleccion,numlist,minimo):
                 accion = ActionChains(driver)
                 accion.double_click(driver.find_element('xpath','//*[@id="PhoneNumber"]')).perform()
                 time.sleep(1)
-                driver.find_element('xpath','//*[@id="PhoneNumber"]').send_keys(1111111)
+                driver.find_element('xpath','//*[@id="PhoneNumber"]').send_keys(1111111)#//*[@id="PhoneNumber"]
                 time.sleep(1)    
-            elif div_info_id == "group_4" and phone.text == "Nuevo...":
+            except:
+                phone=div_info.find_element(By.XPATH,'//*[@id="PhoneId"]')
                 phone.click.click()
                 driver.find_element('xpath','//*[@id="select2-PhoneId-container"]').click()
                 time.sleep(1)
