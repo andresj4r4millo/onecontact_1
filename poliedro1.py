@@ -11,6 +11,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import Select
 
 model_e="MOTOROLA"
 reglist=[]
@@ -199,12 +200,19 @@ def validaciones(doclist, niplist, operlist):
 
 def forms2(correo,plan,reglist,selleccion,numlist,minimo):
     cone=0
+    while True:
+        try:
+            driver.find_element(By.XPATH,'//*[@id="ActivationClass_CfmToFirstInvoice"]').click()
+            driver.find_element('xpath','//*[@id="ActivationClass_LinkPreactivation"]').click()
+            break
+        except:
+            continue
+    cone=0
     while cone<=4:
         try:
             time.sleep(3)
             #CLASES DE ACTIVACION //*[@id="ActivationClass_CfmToFirstInvoice"]
-            driver.find_element(By.XPATH,'//*[@id="ActivationClass_CfmToFirstInvoice"]').click()
-            driver.find_element('xpath','//*[@id="ActivationClass_LinkPreactivation"]').click()
+            
             #CORREO DEL CLIENTE //*[@id="PersonalInfo_Email"]
             driver.find_element('xpath','//*[@id="PersonalInfo_Email"]').clear()
             driver.find_element('xpath','//*[@id="PersonalInfo_Email"]').send_keys(correo)
@@ -212,12 +220,11 @@ def forms2(correo,plan,reglist,selleccion,numlist,minimo):
             #NUMERO DE TELEFONO 
             div_info=driver.find_element(By.ID,'group_4')
             print(div_info.text)
-            #nuevo=driver.find_element(By.XPATH,'//*[@id="select2-PhoneId-container"]')
+            nuevo=driver.find_element(By.XPATH,'//*[@id="select2-PhoneId-container"]')
             phone=driver.find_element(By.XPATH,'//*[@id="PhoneId"]')
             #//*[@id="select2-PhoneId-container"]
 
             try:
-                nuevo = div_info.find_element(By.ID,'group_4')
                 nuevo.click()
                 #escribir nuevo: 
                 driver.find_element(By.XPATH,"/html/body/span/span/span[1]/input").send_keys("NUEVO")#/html/body/span/span/span[1]/input
@@ -238,11 +245,14 @@ def forms2(correo,plan,reglist,selleccion,numlist,minimo):
                 accion.double_click(driver.find_element('xpath','//*[@id="PhoneNumber"]')).perform()
                 time.sleep(1)
                 driver.find_element('xpath','//*[@id="PhoneNumber"]').send_keys(1111111)#//*[@id="PhoneNumber"]
-                time.sleep(1)    
+                time.sleep(1)  
             except:
-                phone=div_info.find_element(By.XPATH,'//*[@id="PhoneId"]')
-                phone.click.click()
-                driver.find_element('xpath','//*[@id="select2-PhoneId-container"]').click()
+                #//*[@id="PhoneId"]
+                select_element = driver.find_element(By.ID, 'PhoneId')
+                select = Select(select_element)
+
+                driver.find_element('xpath','//*[@id="PhoneId"]').click()
+                select.select_by_visible_text('Nuevo...')
                 time.sleep(1)
                 driver.find_element('xpath',"/html/body/span/span/span[2]/ul/li[1]").click()
                 time.sleep(2)
@@ -258,11 +268,14 @@ def forms2(correo,plan,reglist,selleccion,numlist,minimo):
                 accion.double_click(driver.find_element('xpath','//*[@id="PhoneNumber"]')).perform()
                 time.sleep(1)
                 driver.find_element('xpath','//*[@id="PhoneNumber"]').send_keys(1111111)
+                time.sleep(1)
                 #INFORMACION DE PORTABILIDAD
             break
         except:
             cone+=1
             continue
+
+
     #para generar error en caso de que los elementos no se hagan presentes
     if cone>=4:
         driver.find_element('xpath','//*[@id="DetailProduct_Iccid"]').click()
