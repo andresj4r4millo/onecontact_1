@@ -145,8 +145,9 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,s
 
                     driver.find_element('xpath','//*[@id="btnNext"]').click()
                     ##FORMULARIO 2    
-                    time.sleep(3)
+                    #time.sleep(3)
                     driver.find_element('xpath','/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div/div[5]/div[2]/div[11]/div/div[2]/div[2]/div').click()
+                    time.sleep(4)
                     break
             except:
                 cone+=1
@@ -156,6 +157,7 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,s
         complemento=complemento
     else:
         complemento="error en los datos"
+
     if cone>=8:
         driver.find_element('xpath','//*[@id="DetailProduct_MinBroughtPortability"]').click()
         errorlist.append(cedula)
@@ -165,7 +167,6 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,s
     
 #ESTA FUNCION EVALUARA SI EL RECHAZO PASA O NO, Y EL PORQUE, PARA SEGMENTARLO POR LISTAS
 def validaciones(doclist, niplist, operlist, complemento): 
-
     cone=0
     while cone<7:
         try:
@@ -256,27 +257,78 @@ def forms2(correo,plan,reglist,selleccion,numlist,minimo,complemento):
                 time.sleep(1)
                 driver.find_element('xpath','//*[@id="PhoneNumber"]').send_keys(1111111)#//*[@id="PhoneNumber"]
                 time.sleep(1) 
-
             except:
-                driver.find_element(By.XPATH,'//*[@id="PhoneNumber"]').click()
-                lista=driver.find_element(By.XPATH,'//*[@id="PhoneNumber"]')
+                div=driver.find_element(By.ID,"group_4")
+                driver.find_element(By.ID,"PhoneNumber").click()
+                lista=driver.find_element(By.ID,"PhoneNumber")
                 # Localizar el elemento de la lista desplegable por su XPath
                 # Crear un objeto Select para el elemento de la lista desplegable
                 select = Select(lista)
                 # Seleccionar la opción "Nuevo" por su valor
                 select.select_by_visible_text("Nuevo...")
+                div.click()
+                #//*[@id="PhoneClass"]
+                driver.find_element(By.ID,"PhoneClass").click()
+                listaf=driver.find_element(By.ID,"PhoneClass")
+                #fijo
+                selectf = Select(listaf)
+                # Seleccionar la opción "Nuevo" por su valor
+                selectf.select_by_visible_text("Fijo")
+                div.click()
+                #1
+                driver.find_element(By.ID,"Prefix").click()
+                listap=driver.find_element(By.ID,"Prefix")
+                
+                #fijo
+                select = Select(listap)
+                # Seleccionar la opción "Nuevo" por su valor
+                select.select_by_visible_text("1")
 
                 accion = ActionChains(driver)
-                accion.double_click(driver.find_element('xpath','//*[@id="PhoneNumber"]')).perform()
+                accion.double_click(driver.find_element(By.ID,"PhoneNumber")).perform()
                 time.sleep(1)
-                driver.find_element('xpath','//*[@id="PhoneNumber"]').send_keys(1111111)
+                driver.find_element(By.ID,"PhoneNumber").send_keys(1111111)
                 time.sleep(1)
                 #INFORMACION DE PORTABILIDAD
 
             break
         except:
-            cone+=1
-            continue
+            try:
+                div=driver.find_element(By.ID,"group_4")
+                driver.find_element(By.ID,"PhoneNumber").click()
+                lista=driver.find_element(By.ID,"PhoneNumber")
+                # Localizar el elemento de la lista desplegable por su XPath
+                # Crear un objeto Select para el elemento de la lista desplegable
+                select = Select(lista)
+                # Seleccionar la opción "Nuevo" por su valor
+                select.select_by_visible_text("Nuevo...")
+                div.click()
+                #//*[@id="PhoneClass"]
+                driver.find_element(By.ID,"PhoneClass").click()
+                listaf=driver.find_element(By.ID,"PhoneClass")
+                #fijo
+                selectf = Select(listaf)
+                # Seleccionar la opción "Nuevo" por su valor
+                selectf.select_by_visible_text("Fijo")
+                div.click()
+                #1
+                driver.find_element(By.ID,"Prefix").click()
+                listap=driver.find_element(By.ID,"Prefix")
+                
+                #fijo
+                select = Select(listap)
+                # Seleccionar la opción "Nuevo" por su valor
+                select.select_by_visible_text("1")
+
+                accion = ActionChains(driver)
+                accion.double_click(driver.find_element(By.ID,"PhoneNumber")).perform()
+                time.sleep(1)
+                driver.find_element(By.ID,"PhoneNumber").send_keys(1111111)
+                time.sleep(1)
+                break
+            except:
+                cone+=1
+                continue
 
 
     #para generar error en caso de que los elementos no se hagan presentes
