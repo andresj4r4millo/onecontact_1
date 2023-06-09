@@ -2,6 +2,8 @@
 from selenium import webdriver
 import time
 from selenium.webdriver.common.action_chains import ActionChains
+#para el libro de exporte
+import csv
 
 import pandas as pd
 import numpy as np
@@ -39,9 +41,9 @@ dicplan={
 
 }
 
+complemento=""
 
-
-def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,simlist):
+def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,simlist,complemento):
     error="no"
     #primeros pasos, primer formulario
     #while con el fin de no lanzar error si el script no encuentra los elementos en la pagina
@@ -136,6 +138,7 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,s
                     sim_adquirida.click()
                     simlist.append(cedula)
                     print("sim adquirida")
+                    complemento="sim adquirida"
                     cone=6
                     break
                 except:
@@ -149,6 +152,10 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,s
                 cone+=1
 
     #ESTAS LINEAS DE CODIGO GENERARAN ERROR SI LA PAGINA NO REALIZA LA CONSULTA DESPUES DE 6 INTENTOS
+    if complemento=="sim adquirida":
+        complemento=complemento
+    else:
+        complemento="error en los datos"
     if cone>=8:
         driver.find_element('xpath','//*[@id="DetailProduct_MinBroughtPortability"]').click()
         errorlist.append(cedula)
@@ -157,7 +164,7 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,s
 
     
 #ESTA FUNCION EVALUARA SI EL RECHAZO PASA O NO, Y EL PORQUE, PARA SEGMENTARLO POR LISTAS
-def validaciones(doclist, niplist, operlist): 
+def validaciones(doclist, niplist, operlist, complemento): 
 
     cone=0
     while cone<7:
@@ -176,16 +183,19 @@ def validaciones(doclist, niplist, operlist):
             continue 
     if cone>=6:
         try:
+            #//*[@id="validationResponses"]/div[5]/div[2]/div[11]/div/div[2]/div[1]
             v_nip=driver.find_element(By.XPATH,'//*[@id="validationResponses"]/div[5]/div[2]/div[11]/div/div[2]/div[1]/div')
-            if "EL NIP NO SE ENCUENTRA VIGENTE" in v_nip:
+            if "El NIP no se encuentra vigente" in v_nip.text:
                 niplist.append(cedula)
+                complemento="el nip no se encuentra vigente"
             ##las siguientes lineas de codigo evaluan si el rechazo no pasa por el documento
             element = driver.find_element(By.XPATH,'//*[@id="validationResponses"]/div[6]/div[2]/div[3]/div/div/div')
             document= element.text
-            if document=="DOCUMENTO NO APLICA PARA ACTIVACIÓN POLIEDRO":
+            if "DOCUMENTO NO APLICA PARA ACTIVACIÓN POLIEDRO"in element.text:
                 doclist.appen(cedula)
+                complemento="documento no aplica"
         except:
-            print("documnto aplica")
+            print("documento aplica")
     if cone>=6:
         errorlist.append(cedula)  
         driver.find_element('xpath','//*[@id="DetailProduct_MinBroughtPortability"]').click()  
@@ -198,7 +208,7 @@ def validaciones(doclist, niplist, operlist):
 
 
 
-def forms2(correo,plan,reglist,selleccion,numlist,minimo):
+def forms2(correo,plan,reglist,selleccion,numlist,minimo,complemento):
     cone=0
     while True:
         try:
@@ -245,19 +255,14 @@ def forms2(correo,plan,reglist,selleccion,numlist,minimo):
                 accion.double_click(driver.find_element('xpath','//*[@id="PhoneNumber"]')).perform()
                 time.sleep(1)
                 driver.find_element('xpath','//*[@id="PhoneNumber"]').send_keys(1111111)#//*[@id="PhoneNumber"]
-                time.sleep(1)  
+                time.sleep(1) 
+
             except:
-                #//*[@id="PhoneId"]
-
-                #driver.find_element(By.XPATH,'//*[@id="PhoneNumber"]').click()
-
+                driver.find_element(By.XPATH,'//*[@id="PhoneNumber"]').click()
                 lista=driver.find_element(By.XPATH,'//*[@id="PhoneNumber"]')
                 # Localizar el elemento de la lista desplegable por su XPath
-                
-
                 # Crear un objeto Select para el elemento de la lista desplegable
                 select = Select(lista)
-
                 # Seleccionar la opción "Nuevo" por su valor
                 select.select_by_visible_text("Nuevo...")
 
@@ -267,6 +272,7 @@ def forms2(correo,plan,reglist,selleccion,numlist,minimo):
                 driver.find_element('xpath','//*[@id="PhoneNumber"]').send_keys(1111111)
                 time.sleep(1)
                 #INFORMACION DE PORTABILIDAD
+
             break
         except:
             cone+=1
@@ -350,6 +356,7 @@ def forms2(correo,plan,reglist,selleccion,numlist,minimo):
 
     if  cone>=6:
         numlist.append(cedula)
+        complemento="correo no valido"
         driver.find_element('xpath','//*[@id="DetailProduct_MinBroughtPortability"]').click()
 
     #SELECCIONAR CAMPAÑA DE BENEFICIOS  
@@ -390,10 +397,12 @@ def forms2(correo,plan,reglist,selleccion,numlist,minimo):
         driver.find_element(By.XPATH,'//*[@id="btnPrev"]').click()
         time.sleep(1)
         driver.find_element('xpath','//*[@id="PhoneNumber"]').click()
+        complemento="error al momento de enviar el rechazo(pago minimo)"
         minimo.append(cedula)
 
     print(f"rechazo enviado")
     print(f"cedula: {cedula}")
+    complemento="rechazo enviado"
     reglist.append(cedula)
     #pasos finales 
     time.sleep(6)
@@ -412,6 +421,7 @@ def forms2(correo,plan,reglist,selleccion,numlist,minimo):
         except:
             cone+=1
     if cone>=3:
+        
         driver.find_element(By.XPATH,'//*[@id="btnPrev"]').click()
     
     
@@ -507,78 +517,83 @@ activacion_pospago()
 contador=0
 iterador=1
 nipn=0
-for row, datos in df.iterrows():
-    print(f"iteracion: {iterador}")
-    iterador+=1
-    cc=datos["CEDULA"]
-    apellido=datos["APELLIDO"]
-    ##celular
-    celular=datos["MIN_AP"]
-    nipn=datos["NIP"]
-    serialsim=datos["SERIAL_SIM"]
-    ##celular: no usar, valor ==0
-    correo=datos["CORREO"]
-    planb=datos["PLAN"]
-    conver=datos["CONVERGENCIA"] 
-    operr=datos["OPERADOR"]
-    operador=str(operr)
-    convergencia=str(conver)
+with open('BASEP2.csv', 'w', encoding='utf-8', newline='') as archivo:
+    writer = csv.writer(archivo)
+    for row, datos in df.iterrows():
+        print(f"iteracion: {iterador}")
+        iterador+=1
+        cc=datos["CEDULA"]
+        apellido=datos["APELLIDO"]
+        ##celular
+        celular=datos["MIN_AP"]
+        nipn=datos["NIP"]
+        serialsim=datos["SERIAL_SIM"]
+        ##celular: no usar, valor ==0
+        correo=datos["CORREO"]
+        planb=datos["PLAN"]
+        conver=datos["CONVERGENCIA"] 
+        operr=datos["OPERADOR"]
+        operador=str(operr)
+        convergencia=str(conver)
 
-    nip=str(nipn).rjust(5,"0")
-    #condicion sellecion
-    if convergencia=="SI" and operador=="WOM":
-        sellecion=dicplan['WOM']
-    elif convergencia=="NO" and operador=="WOM":
-        selleccion=dicplan['WOMNO'] 
-    elif convergencia=="SI" and operador=="MOVISTAR":
-        selleccion=dicplan['MOVISTAR']
-    elif convergencia=="NO" and operador=="MOVISTAR":
-        selleccion=dicplan['MOVISTARNO']
-    elif convergencia=="SI" and operador=="TIGO":
-        selleccion=dicplan['TIGO']
-    elif convergencia=="NO" and operador=="TIGO":
-        selleccion=dicplan['TIGONO']
-    elif convergencia=="NO" and operador=="ETB":
-        selleccion=dicplan["ETBNO"]
-    elif convergencia=="SI" and operador=="ETB":
-        selleccion=dicplan["ETB"] 
-    elif convergencia=="NO" and operador=="AVANTEL":
-        selleccion=dicplan["AVANTELNO"]   
-    elif convergencia=="SI" and operador=="AVANTEL":
-        selleccion=dicplan["AVANTEL"]
-    else:
-        sellecion='/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div/div[5]/div/div/div/div[2]/div[2]/fieldset/div[1]/span/span/input'
-    cedulaa=str(cedul)
-    cedula=str(cc)
-    plan=str(planb)
+        nip=str(nipn).rjust(5,"0")
+        #condicion sellecion
+        if convergencia=="SI" and operador=="WOM":
+            sellecion=dicplan['WOM']
+        elif convergencia=="NO" and operador=="WOM":
+            selleccion=dicplan['WOMNO'] 
+        elif convergencia=="SI" and operador=="MOVISTAR":
+            selleccion=dicplan['MOVISTAR']
+        elif convergencia=="NO" and operador=="MOVISTAR":
+            selleccion=dicplan['MOVISTARNO']
+        elif convergencia=="SI" and operador=="TIGO":
+            selleccion=dicplan['TIGO']
+        elif convergencia=="NO" and operador=="TIGO":
+            selleccion=dicplan['TIGONO']
+        elif convergencia=="NO" and operador=="ETB":
+            selleccion=dicplan["ETBNO"]
+        elif convergencia=="SI" and operador=="ETB":
+            selleccion=dicplan["ETB"] 
+        elif convergencia=="NO" and operador=="AVANTEL":
+            selleccion=dicplan["AVANTELNO"]   
+        elif convergencia=="SI" and operador=="AVANTEL":
+            selleccion=dicplan["AVANTEL"]
+        else:
+            sellecion='/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div/div[5]/div/div/div/div[2]/div[2]/fieldset/div[1]/span/span/input'
+        cedulaa=str(cedul)
+        cedula=str(cc)
+        plan=str(planb)
 
-    
-    cedulaa=str(cedul)
-    
-    #ciclo
-    #EL CICLO SE REPITE EN CASO DE ERROR POR SI LOS ELEMENTOS DE LA PAGINA NO CARGAN Y SE GENERA ALGUN ERROR
-    #  PARA NO PASAR POR ALTO EL REGISTRO
-    try:
-        inicio()
-        time.sleep(1)
-        formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,simlist)
-        validaciones(doclist, niplist, operlist)
-        forms2(correo,plan,reglist,selleccion,numlist,minimo)
-        contador=contador+1
-    except:
+        
+        cedulaa=str(cedul)
+        
+        #ciclo
+        #EL CICLO SE REPITE EN CASO DE ERROR POR SI LOS ELEMENTOS DE LA PAGINA NO CARGAN Y SE GENERA ALGUN ERROR
+        #  PARA NO PASAR POR ALTO EL REGISTRO
         try:
             inicio()
             time.sleep(1)
-            formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,simlist)
-            validaciones(doclist, niplist, operlist)
-            forms2(correo,plan,reglist,selleccion,numlist,minimo)
+            formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,simlist,complemento)
+            validaciones(doclist, niplist, operlist,complemento)
+            forms2(correo,plan,reglist,selleccion,numlist,minimo,complemento)
             contador=contador+1
         except:
-            continue
-    finally:
-        time.sleep(1)
-        print("one contact")   
-    continue
+            try:
+                inicio()
+                time.sleep(1)
+                formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,simlist,complemento)
+                validaciones(doclist, niplist, operlist,complemento)
+                forms2(correo,plan,reglist,selleccion,numlist,minimo,complemento)
+                contador=contador+1
+            except:
+                continue
+        finally:
+            time.sleep(1)
+            print("one contact")
+
+        writer.writerow([cedula, complemento])
+
+        continue
 
 
 
@@ -601,4 +616,4 @@ print("los siguientes rechazos no pudieron ser enviados debido a que el min se e
 print(niplist)
 print("los siguientes rechazos no pasaron por pago minimo")
 print(minimo)
-print(" ONE CONTACT COLOMBIA ")
+
