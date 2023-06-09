@@ -248,11 +248,19 @@ def forms2(correo,plan,reglist,selleccion,numlist,minimo):
                 time.sleep(1)  
             except:
                 #//*[@id="PhoneId"]
-                select_element = driver.find_element(By.ID, 'PhoneId')
-                select = Select(select_element)
 
-                driver.find_element('xpath','//*[@id="PhoneId"]').click()
-                select.select_by_visible_text('Nuevo...')
+
+                # Localizar el elemento de la lista desplegable por su XPath
+                lista_desplegable = driver.find_element(By.XPATH, '//*[@id="PhoneId"]')
+
+                # Crear un objeto Select para el elemento de la lista desplegable
+                select = Select(lista_desplegable)
+
+                # Seleccionar la opción "Nuevo" por su valor
+                select.select_by_value("nuevo")
+
+   
+
                 time.sleep(1)
                 driver.find_element('xpath',"/html/body/span/span/span[2]/ul/li[1]").click()
                 time.sleep(2)
