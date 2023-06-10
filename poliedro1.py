@@ -3,7 +3,9 @@ from selenium import webdriver
 import time
 from selenium.webdriver.common.action_chains import ActionChains
 #para el libro de exporte
-import csv
+import openpyxl
+from unidecode import unidecode
+import re
 
 import pandas as pd
 import numpy as np
@@ -119,7 +121,6 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,s
     except:
         #SI LA CONSULTA NO SE REALIZA EL SIGUIENTE BUCLE DIGITA NUEVAMENTE LA CEDULA DEL ASESOR, LA FECHA Y REALIZA LA CONSULTA HASTA QUE SE REDIRIGA AL SISGUIENTE FORM
         cone=0
-        
         while cone<8:
 
             try:
@@ -140,16 +141,18 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,s
                     print("sim adquirida")
                     complemento="sim adquirida"
                     cone=6
-                    break
+                    break  
                 except:
 
                     driver.find_element('xpath','//*[@id="btnNext"]').click()
                     ##FORMULARIO 2    
                     #time.sleep(3)
+                    time.sleep(3)
                     driver.find_element('xpath','/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div/div[5]/div[2]/div[11]/div/div[2]/div[2]/div').click()
-                    time.sleep(4)
                     break
             except:
+                if cone==8:
+                    break
                 cone+=1
 
     #ESTAS LINEAS DE CODIGO GENERARAN ERROR SI LA PAGINA NO REALIZA LA CONSULTA DESPUES DE 6 INTENTOS
@@ -158,8 +161,11 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,s
     else:
         complemento="error en los datos"
 
-    if cone>=8:
-        driver.find_element('xpath','//*[@id="DetailProduct_MinBroughtPortability"]').click()
+    print(cone)
+    print(complemento)
+    if cone>=8 or complemento=="sim adquirida":
+        print("error ")
+        driver.find_element('xpath','para generar error14').click()
         errorlist.append(cedula)
 
     
@@ -168,8 +174,9 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,s
 #ESTA FUNCION EVALUARA SI EL RECHAZO PASA O NO, Y EL PORQUE, PARA SEGMENTARLO POR LISTAS
 def validaciones(doclist, niplist, operlist, complemento): 
     cone=0
-    while cone<7:
+    while cone<4:
         try:
+            print("buscando el boton para continuar ")
             #driver.find_element(By.XPATH, '//*[@id="btnNext"]').click()
             #time.sleep(2) 
             #driver.find_element(By.XPATH, '//*[@id="ActivationClass_CfmToFirstInvoice"]')
@@ -182,7 +189,7 @@ def validaciones(doclist, niplist, operlist, complemento):
             #regresar
             cone+=1
             continue 
-    if cone>=6:
+    if cone>=4:
         try:
             #//*[@id="validationResponses"]/div[5]/div[2]/div[11]/div/div[2]/div[1]
             v_nip=driver.find_element(By.XPATH,'//*[@id="validationResponses"]/div[5]/div[2]/div[11]/div/div[2]/div[1]/div')
@@ -197,11 +204,11 @@ def validaciones(doclist, niplist, operlist, complemento):
                 complemento="documento no aplica"
         except:
             print("documento aplica")
-    if cone>=6:
+    if cone>=4:
         errorlist.append(cedula)  
         driver.find_element('xpath','//*[@id="DetailProduct_MinBroughtPortability"]').click()  
         #para generar error
-        driver.find_element('xpath','//*[@id="ActivationClass_LinkPreactivation"]').click()
+        driver.find_element('xpath','para generar error ').click()
 
 ####FORMULARIO 3#####
 #APARTIR DE AQUI SE DEFINE SI EL RECHAZO PASA O NO, HAY VARIAS ESTRUCTURAS PARA QUE LOS CAMPOS SEAN DILIGENCIADOS O LLENADOS
@@ -230,7 +237,7 @@ def forms2(correo,plan,reglist,selleccion,numlist,minimo,complemento):
             time.sleep(1)
             #NUMERO DE TELEFONO 
             div_info=driver.find_element(By.ID,'group_4')
-            print(div_info.text)
+
             nuevo=driver.find_element(By.XPATH,'//*[@id="select2-PhoneId-container"]')
             phone=driver.find_element(By.XPATH,'//*[@id="PhoneId"]')
             #//*[@id="select2-PhoneId-container"]
@@ -258,6 +265,7 @@ def forms2(correo,plan,reglist,selleccion,numlist,minimo,complemento):
                 driver.find_element('xpath','//*[@id="PhoneNumber"]').send_keys(1111111)#//*[@id="PhoneNumber"]
                 time.sleep(1) 
             except:
+                #PENDIENTE DE VER SU EJECUCION 
                 div=driver.find_element(By.ID,"group_4")
                 driver.find_element(By.ID,"PhoneNumber").click()
                 lista=driver.find_element(By.ID,"PhoneNumber")
@@ -334,6 +342,7 @@ def forms2(correo,plan,reglist,selleccion,numlist,minimo,complemento):
     #para generar error en caso de que los elementos no se hagan presentes
     if cone>=4:
         driver.find_element('xpath','//*[@id="DetailProduct_Iccid"]').click()
+        
         print("eror al diligenciar campos")
     
     #pospago boton de seleccion
@@ -363,10 +372,39 @@ def forms2(correo,plan,reglist,selleccion,numlist,minimo,complemento):
                 driver.find_element('xpath','//*[@id="Sendbill_Email"]').clear()
                 driver.find_element('xpath','//*[@id="Sendbill_Email"]').send_keys(f"{ncorreo[0]}@yahoo.com")
                 accion = ActionChains(driver)
-                accion.double_click(driver.find_element('xpath','//*[@id="PhoneNumber"]')).perform()
+                ######
+                div=driver.find_element(By.ID,"group_4")
+                driver.find_element(By.ID,"PhoneNumber").click()
+                lista=driver.find_element(By.ID,"PhoneNumber")
+                # Localizar el elemento de la lista desplegable por su XPath
+                # Crear un objeto Select para el elemento de la lista desplegable
+                select = Select(lista)
+                # Seleccionar la opción "Nuevo" por su valor
+                select.select_by_visible_text("Nuevo...")
+                div.click()
+                #//*[@id="PhoneClass"]
+                driver.find_element(By.ID,"PhoneClass").click()
+                listaf=driver.find_element(By.ID,"PhoneClass")
+                #fijo
+                selectf = Select(listaf)
+                # Seleccionar la opción "Nuevo" por su valor
+                selectf.select_by_visible_text("Fijo")
+                div.click()
+                #1
+                driver.find_element(By.ID,"Prefix").click()
+                listap=driver.find_element(By.ID,"Prefix")
+                
+                #fijo
+                select = Select(listap)
+                # Seleccionar la opción "Nuevo" por su valor
+                select.select_by_visible_text("1")
+
+                accion = ActionChains(driver)
+                accion.double_click(driver.find_element(By.ID,"PhoneNumber")).perform()
                 time.sleep(1)
-                driver.find_element('xpath','//*[@id="PhoneNumber"]').send_keys(1111111)
+                driver.find_element(By.ID,"PhoneNumber").send_keys(1111111)
                 time.sleep(1)
+                ######
                 buton=driver.find_element(By.XPATH,'//*[@id="PersonalInfo_ProductDonorOperator"]')
                 if buton.is_selected():
                     driver.find_element('xpath','//*[@id="btnNext"]').click()
@@ -380,6 +418,11 @@ def forms2(correo,plan,reglist,selleccion,numlist,minimo,complemento):
                 break
             except:
                 cone+=1
+
+    if  cone>=4:
+        numlist.append(cedula)
+        complemento="correo no valido"
+        driver.find_element('xpath','//*[@id="DetailProduct_MinBroughtPortability"]').click()
 
     cone=0
     while cone<=6:
@@ -544,11 +587,9 @@ print("definamos una fecha a portar para todas las iteraciones")
 diap=input("digite dia: ")
 mesp=input("digite mes: ")
 año=input("digite año: ")
-print("desea usar la cedula de la base o una generica?")
+
 
 cedul=input("digite cedula generica de asesor: ")
-print("digite s si desea usar la cedula generica, cualquier otro caracter si usara la base")
-opc=input("digite opcion: ")
 dia=str(diap).rjust(2,"0")
 mes=str(mesp).rjust(2,"0")
 fechap=(f"{dia}/{mes}/{año}")
@@ -570,7 +611,7 @@ contador=0
 iterador=1
 nipn=0
 with open('BASEP2.csv', 'w', encoding='utf-8', newline='') as archivo:
-    writer = csv.writer(archivo)
+
     for row, datos in df.iterrows():
         print(f"iteracion: {iterador}")
         iterador+=1
@@ -630,21 +671,19 @@ with open('BASEP2.csv', 'w', encoding='utf-8', newline='') as archivo:
             forms2(correo,plan,reglist,selleccion,numlist,minimo,complemento)
             contador=contador+1
         except:
-            try:
-                inicio()
-                time.sleep(1)
-                formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,simlist,complemento)
-                validaciones(doclist, niplist, operlist,complemento)
-                forms2(correo,plan,reglist,selleccion,numlist,minimo,complemento)
-                contador=contador+1
-            except:
-                continue
+            
+            inicio()
+            time.sleep(1)
+            formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,simlist,complemento)
+            validaciones(doclist, niplist, operlist,complemento)
+            forms2(correo,plan,reglist,selleccion,numlist,minimo,complemento)
+            contador=contador+1
         finally:
+            datosfila=(f"{cedula}:  {complemento}")
+            print(datosfila)
+            archivo.write(datosfila + '\n')
             time.sleep(1)
             print("one contact")
-
-        writer.writerow([cedula, complemento])
-
         continue
 
 
