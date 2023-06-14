@@ -1,4 +1,3 @@
-#DRIVERS
 from selenium import webdriver
 import time
 from selenium.webdriver.common.action_chains import ActionChains
@@ -47,7 +46,7 @@ complemento=""
 
 def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,simlist):
     global complemento
-    error="no"
+    paso="no"
     #primeros pasos, primer formulario
     #while con el fin de no lanzar error si el script no encuentra los elementos en la pagina
     cone=0
@@ -119,6 +118,7 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,s
         ##FORMULARIO 2    
         time.sleep(3)
         driver.find_element('xpath','/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div/div[5]/div[2]/div[11]/div/div[2]/div[2]/div').click()  
+        paso="si"
     except:
         #SI LA CONSULTA NO SE REALIZA EL SIGUIENTE BUCLE DIGITA NUEVAMENTE LA CEDULA DEL ASESOR, LA FECHA Y REALIZA LA CONSULTA HASTA QUE SE REDIRIGA AL SISGUIENTE FORM
         cone=0
@@ -141,7 +141,7 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,s
                     simlist.append(cedula)
                     print("sim adquirida")
                     complemento="sim adquirida"
-                    cone=6
+                    cone=8
                     break  
                 except:
 
@@ -150,24 +150,28 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,s
                     #time.sleep(3)
                     time.sleep(3)
                     driver.find_element('xpath','/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div/div[5]/div[2]/div[11]/div/div[2]/div[2]/div').click()
+                    paso="si"
+                    cone=0
                     break
-            except:
+            except: 
                 if cone==8:
                     break
-                cone+=1
+                else:
+                    cone+=1
+                    continue
+                
 
     #ESTAS LINEAS DE CODIGO GENERARAN ERROR SI LA PAGINA NO REALIZA LA CONSULTA DESPUES DE 6 INTENTOS
-    if complemento=="sim adquirida":
-        complemento=complemento
-    else:
+    if complemento!="sim adquirida":
         complemento="error en los datos"
 
-    print(cone)
-    print(complemento)
-    if cone>=8 or complemento=="sim adquirida":
-        print("error ")
-        driver.find_element('xpath','para generar error14').click()
+    if cone>=8:
+        driver.find_element(By.XPATH,'//*[@id="PersonalInfo_ProductDonorOperator"]').click()
         errorlist.append(cedula)
+    elif complemento=="sim adquirida":
+        driver.find_element(By.XPATH,'//*[@id="PersonalInfo_ProductDonorOperator"]').click()
+    elif paso=="si":
+        print("en espera por validacion")
 
     
 
@@ -204,13 +208,14 @@ def validaciones(doclist, niplist, operlist):
             if "DOCUMENTO NO APLICA PARA ACTIVACIÓN POLIEDRO"in element.text:
                 doclist.appen(cedula)
                 complemento="documento no aplica"
+            else:
+                complemento="validacion no correcta"
         except:
             print("documento aplica")
     if cone>=4:
         errorlist.append(cedula)  
         driver.find_element('xpath','//*[@id="DetailProduct_MinBroughtPortability"]').click()  
-        #para generar error
-        driver.find_element('xpath','para generar error ').click()
+
 
 ####FORMULARIO 3#####
 #APARTIR DE AQUI SE DEFINE SI EL RECHAZO PASA O NO, HAY VARIAS ESTRUCTURAS PARA QUE LOS CAMPOS SEAN DILIGENCIADOS O LLENADOS
@@ -280,6 +285,7 @@ def forms2(correo,plan,reglist,selleccion,numlist,minimo):
             time.sleep(1)
             driver.find_element('xpath','//*[@id="PhoneNumber"]').send_keys(1111111)#//*[@id="PhoneNumber"]
             time.sleep(1) 
+            break
         except:
             try:
                 #PENDIENTE DE VER SU EJECUCION 
@@ -468,15 +474,25 @@ def forms2(correo,plan,reglist,selleccion,numlist,minimo):
     print(f"cedula: {cedula}")
     complemento="rechazo enviado"
     reglist.append(cedula)
-    #pasos finales 
-    time.sleep(3)
-    modal = WebDriverWait(driver, 10).until(
-    EC.presence_of_element_located((By.ID, "MsgModal"))
-    )
-    button = modal.find_element(By.XPATH,'//*[@id="MsgModal"]/div/button[2]')
-    button.click()
-    driver.switch_to.default_content()
-    #driver.find_element('xpath','//*[@id="btnPrev"]').click() //*[@id="btnPrev"]
+    cone=0
+    while cone<=3:
+        try:
+            #pasos finales 
+            time.sleep(3)
+            modal = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.ID, "MsgModal"))
+            )
+            button = modal.find_element(By.XPATH,'//*[@id="MsgModal"]/div/button[2]')#//*[@id="MsgModal"]/div/button[2]
+            time.sleep(1)
+            button.click()
+            driver.switch_to.default_content()
+            #driver.find_element('xpath','//*[@id="btnPrev"]').click() //*[@id="btnPrev"]
+            break
+        except:
+            cone+=1
+    if cone>=3:  
+        driver.find_element(By.XPATH,'//*[@id="btnPrev"]').click()
+    
     cone=0
     while cone<=3:
         try:
@@ -484,8 +500,7 @@ def forms2(correo,plan,reglist,selleccion,numlist,minimo):
             break
         except:
             cone+=1
-    if cone>=3:
-        
+    if cone>=3:  
         driver.find_element(By.XPATH,'//*[@id="btnPrev"]').click()
     
     
@@ -523,31 +538,39 @@ def activacion_pospago():
 
 #ESTA FUNCION PREPARA EL ENTORNO PARA COMENZAR CON EL DILIGENCIAMIENTO DE LOS FORMULARIOS 
 def inicio():
-   #ACTIVACION UNICA
-    driver.find_element('xpath','//*[@id="containerNavBar"]/ul/li[1]/a/span').click()
+    con=0
+    while con<3:
+        try:
+            #ACTIVACION UNICA
+            driver.find_element('xpath','//*[@id="containerNavBar"]/ul/li[1]/a/span').click()
 
-    #ESPERAR A QUE CARGUE POLIEDRO
-    time.sleep(2)
+            #ESPERAR A QUE CARGUE POLIEDRO
+            time.sleep(2)
 
-    #ACTIVACION POSTPAGO
-    driver.find_element('xpath','//*[@id="containerNavBar"]/ul/li[1]/ul/li[2]/a/span').click()
+            #ACTIVACION POSTPAGO
+            driver.find_element('xpath','//*[@id="containerNavBar"]/ul/li[1]/ul/li[2]/a/span').click()
 
-    #ESPERAR A QUE CARGUE POLIEDRO
-    time.sleep(2)
+            #ESPERAR A QUE CARGUE POLIEDRO
+            time.sleep(2)
 
-    
-    #ESPERAR A QUE CARGUE POLIEDRO
-    time.sleep(1)
+            
+            #ESPERAR A QUE CARGUE POLIEDRO
+            time.sleep(1)
 
-    #LLAMAR PORTABILIDAD O MIGRACION  
-    driver.find_element('xpath','//*[@id="select2-productShortcut-container"]').click()
-    time.sleep(1)
-    driver.find_element('xpath','/html/body/span/span/span[1]/input').click()
-    time.sleep(2)
-    driver.find_element('xpath',"/html/body/span/span/span[1]/input").send_keys(208)
-    time.sleep(1)
-    driver.find_element('xpath',"/html/body/span/span/span[1]/input").send_keys(Keys.ENTER)
-    time.sleep(5)
+            #LLAMAR PORTABILIDAD O MIGRACION  
+            driver.find_element('xpath','//*[@id="select2-productShortcut-container"]').click()
+            time.sleep(1)
+            driver.find_element('xpath','/html/body/span/span/span[1]/input').click()
+            time.sleep(2)
+            driver.find_element('xpath',"/html/body/span/span/span[1]/input").send_keys(208)
+            time.sleep(1)
+            driver.find_element('xpath',"/html/body/span/span/span[1]/input").send_keys(Keys.ENTER)
+            time.sleep(5)
+            break
+        except:
+            con+=1
+        if con==3:
+            driver.find_element('xpath','//*[@id="ctl00_ContentPlaceHolder1_BtnRegresarMensaje"]').click()
 
 ##ESTAS LINEAS DE CODIGO RECIBEN LOS DATOS DE LA FECHA A PORTAR Y LA CEDULA, YA QUE 
 #LA CEDULA DEL ASESOR QUE SE CARGA A LA BASE NO SIEMPRE ES APTA PARA DILIGENCIAR LOS FORMULARIOS
@@ -641,13 +664,15 @@ with open('BASEP2.csv', 'w', encoding='utf-8', newline='') as archivo:
             forms2(correo,plan,reglist,selleccion,numlist,minimo)
             contador=contador+1
         except:
-            
-            inicio()
-            time.sleep(1)
-            formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,simlist)
-            validaciones(doclist, niplist, operlist)
-            forms2(correo,plan,reglist,selleccion,numlist,minimo)
-            contador=contador+1
+            try:
+                inicio()
+                time.sleep(1)
+                formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,simlist)
+                validaciones(doclist, niplist, operlist)
+                forms2(correo,plan,reglist,selleccion,numlist,minimo)
+                contador=contador+1
+            except Exception as e:
+                print('excepcion')
         finally:
             datosfila=(f"{cedula}:  {complemento}")
             print(datosfila)
@@ -655,12 +680,6 @@ with open('BASEP2.csv', 'w', encoding='utf-8', newline='') as archivo:
             archivo.flush()
             time.sleep(1)
             print("one contact")
-        continue
-
-
-
-     
-
 
 driver.close()
 print("iteraciones realizadas ",contador)
