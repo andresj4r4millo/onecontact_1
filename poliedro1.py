@@ -623,7 +623,9 @@ with open('BASEP2.csv', 'w', encoding='utf-8', newline='') as archivo:
         convergencia=str(conver)
 
         nip=str(nipn).rjust(5,"0")
+        
         #condicion sellecion
+
         if convergencia=="SI" and operador=="WOM":
             sellecion=dicplan['WOM']
         elif convergencia=="NO" and operador=="WOM":
