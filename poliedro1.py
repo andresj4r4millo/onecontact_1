@@ -220,7 +220,7 @@ def validaciones(doclist, niplist):
                 complemento="validacion no correcta"
         except:
             print("documento aplica")
-    if cone>=4:
+    
         errorlist.append(cedula)  
         driver.find_element('xpath','//*[@id="DetailProduct_MinBroughtPortability"]').click()  
 
@@ -357,17 +357,18 @@ def forms2(correo,plan,reglist,selleccion,numlist,minimo):
             break
         except:
             continue
-
-    while seleccionado!="si":
-        try:
-            driver.find_element(By.XPATH,'//*[@id="PersonalInfo_ProductDonorOperator"]').click()
-            #driver.find_element("xpath",'//*[@id="group_4"]/div[2]/div[1]/div/div/div[1]/span/span').click()
-            #CONTINUAR //*[@id="PhoneNumber"]
-            seleccionado="si"
-            break
-        except:
-            seleccionado="no"
-            continue
+    if seleccionado!="si":
+        cone=0
+        while cone<=4:
+            try:
+                driver.find_element(By.XPATH,'//*[@id="PersonalInfo_ProductDonorOperator"]').click()
+                #driver.find_element("xpath",'//*[@id="group_4"]/div[2]/div[1]/div/div/div[1]/span/span').click()
+                #CONTINUAR //*[@id="PhoneNumber"]
+                seleccionado="si"
+                break
+            except:
+                seleccionado="no"
+                continue
      
     cone=0
     while cone<=4:
