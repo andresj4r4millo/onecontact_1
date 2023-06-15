@@ -44,7 +44,7 @@ dicplan={
 
 complemento=""
 
-def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,simlist):
+def formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,simlist):
     global complemento
     paso="no"
     #primeros pasos, primer formulario
@@ -92,7 +92,6 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,s
                 # /html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div[2]/div[1]/div[2]/div[2]/div/input
                 accion.double_click(driver.find_element('xpath',"/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div[2]/div[1]/div[2]/div[2]/div/input")).perform()
                 driver.find_element('xpath',"/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div[2]/div[1]/div[2]/div[2]/div/input").send_keys(serialsim)
-                
                 break
             except:
                 cone+=1
@@ -123,10 +122,13 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,s
         #SI LA CONSULTA NO SE REALIZA EL SIGUIENTE BUCLE DIGITA NUEVAMENTE LA CEDULA DEL ASESOR, LA FECHA Y REALIZA LA CONSULTA HASTA QUE SE REDIRIGA AL SISGUIENTE FORM
         cone=0
         while cone<8:
-
+            #comenzar a usar cedula generica
+            if cone>4:
+                cedulaa=cedulag
             try:
                 accion = ActionChains(driver)
                 accion.double_click(driver.find_element('xpath','//*[@id="DetailProduct_SellerId"]')).perform()
+                time.sleep(1)
                 driver.find_element(By.XPATH,'//*[@id="DetailProduct_SellerId"]').send_keys(cedulaa)
                 time.sleep(1)
                 #driver.find_element('xpath','//*[@id="DetailProduct_PortabilityDate"]').clear()
@@ -147,14 +149,16 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,s
 
                     driver.find_element('xpath','//*[@id="btnNext"]').click()
                     ##FORMULARIO 2    
-                    #time.sleep(3)
-                    time.sleep(3)
+                    #para confirmar que la pagina se redirecciona
+                    time.sleep(4)
                     driver.find_element('xpath','/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div/div[5]/div[2]/div[11]/div/div[2]/div[2]/div').click()
                     paso="si"
                     cone=0
                     break
             except: 
                 if cone==8:
+                    break
+                elif paso=="si":
                     break
                 else:
                     cone+=1
@@ -177,7 +181,7 @@ def formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,s
 
     
 #ESTA FUNCION EVALUARA SI EL RECHAZO PASA O NO, Y EL PORQUE, PARA SEGMENTARLO POR LISTAS
-def validaciones(doclist, niplist, operlist): 
+def validaciones(doclist, niplist): 
     global complemento
     cone=0
     while cone<4:
@@ -202,12 +206,16 @@ def validaciones(doclist, niplist, operlist):
             if "El NIP no se encuentra vigente" in v_nip.text:
                 niplist.append(cedula)
                 complemento="el nip no se encuentra vigente"
+            elif "El Min ingresado se encuentra en otra solicitud de Portabilidad Numérica" in v_nip.text:
+                complemento="rechazo enviado"
             ##las siguientes lineas de codigo evaluan si el rechazo no pasa por el documento
             element = driver.find_element(By.XPATH,'//*[@id="validationResponses"]/div[6]/div[2]/div[3]/div/div/div')
             document= element.text
             if "DOCUMENTO NO APLICA PARA ACTIVACIÓN POLIEDRO"in element.text:
                 doclist.appen(cedula)
                 complemento="documento no aplica"
+            elif "PRTOABILIDAD NUMERICA " in element.text:
+                complemento="nip no vigente"
             else:
                 complemento="validacion no correcta"
         except:
@@ -259,9 +267,9 @@ def forms2(correo,plan,reglist,selleccion,numlist,minimo):
 
     cone=0
     while cone<=4:
-        div_info=driver.find_element(By.ID,'group_4')
+
         nuevo=driver.find_element(By.XPATH,'//*[@id="select2-PhoneId-container"]')
-        phone=driver.find_element(By.XPATH,'//*[@id="PhoneId"]')
+
         #//*[@id="select2-PhoneId-container"]
         try:
             nuevo.click()
@@ -444,7 +452,7 @@ def forms2(correo,plan,reglist,selleccion,numlist,minimo):
         except:
             paso="no" 
             cone+=1
-        if paso=="si" or cone>=6:
+        if paso=="si" or cone>=8:
             break
  
     #PASOS PARA ENVIAR EL RECHAZO A LA BASE
@@ -492,7 +500,7 @@ def forms2(correo,plan,reglist,selleccion,numlist,minimo):
             cone+=1
     if cone>=3:  
         driver.find_element(By.XPATH,'//*[@id="btnPrev"]').click()
-    
+    #lineas de codigo para generar un regreso en la pagina en caso de intermitencias
     cone=0
     while cone<=3:
         try:
@@ -539,7 +547,7 @@ def activacion_pospago():
 #ESTA FUNCION PREPARA EL ENTORNO PARA COMENZAR CON EL DILIGENCIAMIENTO DE LOS FORMULARIOS 
 def inicio():
     con=0
-    while con<3:
+    while con<4:
         try:
             #ACTIVACION UNICA
             driver.find_element('xpath','//*[@id="containerNavBar"]/ul/li[1]/a/span').click()
@@ -569,7 +577,7 @@ def inicio():
             break
         except:
             con+=1
-        if con==3:
+        if con==4:
             driver.find_element('xpath','//*[@id="ctl00_ContentPlaceHolder1_BtnRegresarMensaje"]').click()
 
 ##ESTAS LINEAS DE CODIGO RECIBEN LOS DATOS DE LA FECHA A PORTAR Y LA CEDULA, YA QUE 
@@ -581,7 +589,7 @@ mesp=input("digite mes: ")
 año=input("digite año: ")
 
 
-cedul=input("digite cedula generica de asesor: ")
+cedulag=input("digite cedula generica de asesor: ")
 dia=str(diap).rjust(2,"0")
 mes=str(mesp).rjust(2,"0")
 fechap=(f"{dia}/{mes}/{año}")
@@ -608,6 +616,7 @@ with open('BASEP2.csv', 'w', encoding='utf-8', newline='') as archivo:
     for row, datos in df.iterrows():
         print(f"iteracion: {iterador}")
         iterador+=1
+        cedulaa=datos["CEDULAA"]
         cc=datos["CEDULA"]
         apellido=datos["APELLIDO"]
         ##celular
@@ -648,12 +657,12 @@ with open('BASEP2.csv', 'w', encoding='utf-8', newline='') as archivo:
             selleccion=dicplan["AVANTEL"]
         else:
             sellecion='/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div/div[5]/div/div/div/div[2]/div[2]/fieldset/div[1]/span/span/input'
-        cedulaa=str(cedul)
+
         cedula=str(cc)
         plan=str(planb)
 
         
-        cedulaa=str(cedul)
+   
         
         #ciclo
         #EL CICLO SE REPITE EN CASO DE ERROR POR SI LOS ELEMENTOS DE LA PAGINA NO CARGAN Y SE GENERA ALGUN ERROR
@@ -661,16 +670,16 @@ with open('BASEP2.csv', 'w', encoding='utf-8', newline='') as archivo:
         try:
             inicio()
             time.sleep(1)
-            formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,simlist)
-            validaciones(doclist, niplist, operlist)
+            formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,simlist)
+            validaciones(doclist, niplist)
             forms2(correo,plan,reglist,selleccion,numlist,minimo)
             contador=contador+1
         except:
             try:
                 inicio()
                 time.sleep(1)
-                formularios(cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,simlist)
-                validaciones(doclist, niplist, operlist)
+                formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,simlist)
+                validaciones(doclist, niplist)
                 forms2(correo,plan,reglist,selleccion,numlist,minimo)
                 contador=contador+1
             except Exception as e:
