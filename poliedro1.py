@@ -16,34 +16,29 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select
 
 model_e="MOTOROLA"
-reglist=[]
 cone=0
-errorlist=[]
-doclist=[]
-niplist=[]
-operlist=[]
-simlist=[]
-numlist=[]
-minimo=[]
 
-#comentario
-dicplan={
-    "WOM": '/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div/div[5]/div/div/div/div[2]/div[4]/fieldset/div[1]/span/span/input',
-    "TIGO": '/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div/div[5]/div/div/div/div[2]/div[13]/fieldset/div[1]/span/span/input',
-    "MOVISTAR":'/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div/div[5]/div/div/div/div[2]/div[4]/fieldset/div[1]/span/span/input',
-    "WOMNO":'/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div/div[5]/div/div/div/div[2]/div[7]/fieldset/div[1]/span/span/input',
-    "TIGONO":'/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div/div[5]/div/div/div/div[2]/div[14]/fieldset/div[1]/span/span/input',
-    "MOVISTARNO":'/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div/div[5]/div/div/div/div[2]/div[7]/fieldset/div[1]/span/span/input',
-    "ETB":'/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div/div[5]/div/div/div/div[2]/div[13]/fieldset/div[1]/span/span/input',
-    "ETBNO":'/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div/div[5]/div/div/div/div[2]/div[14]/fieldset/div[1]/span/span/input',
-    "AVANTEL":'/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div/div[5]/div/div/div/div[2]/div[4]/fieldset/div[1]/span/span/input',
-    "AVANTELNO":'/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div/div[5]/div/div/div/div[2]/div[7]/fieldset/div[1]/span/span/input'
+dicplan={}
+workbook = openpyxl.load_workbook('CAMPAÑAS.xlsx', read_only=True, data_only=True, keep_links=False, keep_vba=False)
+# Seleccionar la hoja de cálculo que deseas leer
+sheet = workbook['BENEFICIOS']
 
-}
+# Iterar sobre las filas en la hoja de cálculo
+for index, row in enumerate(sheet.iter_rows(values_only=True), start=1):
+    if index==1:
+        continue
+    CLAVE=str(row[0])
+    VALOR = str(row[1]) 
+
+    dicplan[CLAVE]=str(VALOR)
+
+print("diccionario, campañas de beneficios")
+for opera, campaña in dicplan.items():
+    print(opera, campaña)
 
 complemento=""
 
-def formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,simlist):
+def formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim):
     global complemento
     paso="no"
     #primeros pasos, primer formulario
@@ -139,7 +134,6 @@ def formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim,err
                 try:
                     sim_adquirida=driver.find_element(By.XPATH,'//*[@id="DetailProduct_MinBroughtPortability"]')
                     sim_adquirida.click()
-                    simlist.append(cedula)
                     print("sim adquirida")
                     complemento="sim adquirida"
                     cone=8
@@ -168,7 +162,6 @@ def formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim,err
 
     if cone>=8:
         driver.find_element(By.XPATH,'//*[@id="PersonalInfo_ProductDonorOperator"]').click()
-        errorlist.append(cedula)
     elif complemento=="sim adquirida":
         driver.find_element(By.XPATH,'//*[@id="PersonalInfo_ProductDonorOperator"]').click()
     elif paso=="si":
@@ -178,7 +171,7 @@ def formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim,err
 
     
 #ESTA FUNCION EVALUARA SI EL RECHAZO PASA O NO, Y EL PORQUE, PARA SEGMENTARLO POR LISTAS
-def validaciones(doclist, niplist): 
+def validaciones(): 
     global complemento
     cone=0
     while cone<4:
@@ -218,7 +211,7 @@ def validaciones(doclist, niplist):
 
 
 
-def forms2(correo,plan,reglist,selleccion,numlist,minimo):
+def forms2(correo,plan,selleccion):
     global complemento
 
     cone=0
@@ -430,7 +423,6 @@ def forms2(correo,plan,reglist,selleccion,numlist,minimo):
                 cone+=1
 
     if  cone>=4:
-        numlist.append(cedula)
         complemento="correo no valido"
         driver.find_element('xpath','//*[@id="DetailProduct_MinBroughtPortability"]').click()
 
@@ -460,7 +452,7 @@ def forms2(correo,plan,reglist,selleccion,numlist,minimo):
     #para generar error en caso de que la pagina no cargue ningun elemento
 
     if  cone>=6:
-        numlist.append(cedula)
+
         complemento="correo no valido"
         driver.find_element('xpath','//*[@id="DetailProduct_MinBroughtPortability"]').click()
 
@@ -507,7 +499,6 @@ def forms2(correo,plan,reglist,selleccion,numlist,minimo):
         time.sleep(1)
         driver.find_element('xpath','//*[@id="PhoneNumber"]').click()
         complemento="error al momento de enviar el rechazo(pago minimo)"
-        minimo.append(cedula)
     else:
         complemento="rechazo enviado"
     print(f"rechazo enviado")
@@ -736,17 +727,17 @@ with open('BASEP2.csv', 'w', encoding='utf-8', newline='') as archivo:
         try:
             inicio()
             time.sleep(1)
-            formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,simlist)
-            validaciones(doclist, niplist)
-            forms2(correo,plan,reglist,selleccion,numlist,minimo)
+            formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim)
+            validaciones()
+            forms2(correo,plan,selleccion)
             contador=contador+1
         except:
             try:
                 inicio()
                 time.sleep(1)
-                formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim,errorlist,simlist)
-                validaciones(doclist, niplist)
-                forms2(correo,plan,reglist,selleccion,numlist,minimo)
+                formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim)
+                validaciones()
+                forms2(correo,plan,selleccion)
                 contador=contador+1
             except Exception as e:
                 print('excepcion')
@@ -763,19 +754,5 @@ with open('BASEP2.csv', 'w', encoding='utf-8', newline='') as archivo:
             print("one contact")
 
 driver.close()
-print("iteraciones realizadas ",contador)
-print("registros realizados: ")
-print(reglist)
-print("errores encontrados:")
-print(errorlist)
-print("los siguientes rechazos no pudieron ser enviados debido al documento: ")
-print(doclist)
-print("estos rechazos no pasaron por sim adquirida")
-print(simlist)
-print("los siguientes rechazos no se enviaron debido a que se necesita cambiar el numero a portar")
-print(numlist)
-print("los siguientes rechazos no pudieron ser enviados debido a que el min se encuentra en otro proceso ")
-print(niplist)
-print("los siguientes rechazos no pasaron por pago minimo")
-print(minimo)
+
 
