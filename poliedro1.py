@@ -5,7 +5,6 @@ from selenium.webdriver.common.action_chains import ActionChains
 import openpyxl
 from unidecode import unidecode
 import re
-
 import pandas as pd
 import numpy as np
 from lxml import html
@@ -166,8 +165,6 @@ def formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim,err
                 
 
     #ESTAS LINEAS DE CODIGO GENERARAN ERROR SI LA PAGINA NO REALIZA LA CONSULTA DESPUES DE 6 INTENTOS
-    if complemento!="sim adquirida":
-        complemento="error en los datos"
 
     if cone>=8:
         driver.find_element(By.XPATH,'//*[@id="PersonalInfo_ProductDonorOperator"]').click()
@@ -202,26 +199,16 @@ def validaciones(doclist, niplist):
     if cone>=4:
         try:
             #//*[@id="validationResponses"]/div[5]/div[2]/div[11]/div/div[2]/div[1]
-            v_nip=driver.find_element(By.XPATH,'//*[@id="validationResponses"]/div[5]/div[2]/div[11]/div/div[2]/div[1]/div')
-            if "El NIP no se encuentra vigente" in v_nip.text:
-                niplist.append(cedula)
-                complemento="el nip no se encuentra vigente"
-            elif "El Min ingresado se encuentra en otra solicitud de Portabilidad Numérica" in v_nip.text:
-                complemento="rechazo enviado"
-            ##las siguientes lineas de codigo evaluan si el rechazo no pasa por el documento
-            element = driver.find_element(By.XPATH,'//*[@id="validationResponses"]/div[6]/div[2]/div[3]/div/div/div')
-            document= element.text
-            if "DOCUMENTO NO APLICA PARA ACTIVACIÓN POLIEDRO"in element.text:
-                doclist.appen(cedula)
-                complemento="documento no aplica"
-            elif "PRTOABILIDAD NUMERICA " in element.text:
-                complemento="nip no vigente"
-            else:
-                complemento="validacion no correcta"
+            validaciones=driver.find_element(By.ID,'viewErrors')
+            validacion=validaciones.text
+            complemento=validacion
         except:
-            print("documento aplica")
-    
-        errorlist.append(cedula)  
+            #//*[@id="validationResponses"]/div[5]/div[2]/div[11]/div/div[2]/div[1]
+            validaciones=driver.find_element(By.ID,'validationResponses')
+            validacion=validaciones.text
+            complemento=validacion
+            
+ 
         driver.find_element('xpath','//*[@id="DetailProduct_MinBroughtPortability"]').click()  
 
 
@@ -233,6 +220,7 @@ def validaciones(doclist, niplist):
 
 def forms2(correo,plan,reglist,selleccion,numlist,minimo):
     global complemento
+
     cone=0
     while True:
         try:
@@ -272,28 +260,66 @@ def forms2(correo,plan,reglist,selleccion,numlist,minimo):
 
         #//*[@id="select2-PhoneId-container"]
         try:
-            nuevo.click()
-            #escribir nuevo: 
-            driver.find_element(By.XPATH,"/html/body/span/span/span[1]/input").send_keys("NUEVO")#/html/body/span/span/span[1]/input
-            driver.find_element(By.XPATH,"/html/body/span/span/span[1]/input").send_keys(Keys.ENTER)
-            time.sleep(1)
-            #//*[@id="select2-PhoneClass-container"] TIPO
-            driver.find_element('xpath','//*[@id="select2-PhoneClass-container"]').click()
-            time.sleep(1)
-            driver.find_element('xpath','/html/body/span/span/span[1]/input').send_keys("FIJO")#FIJO
-            driver.find_element(By.XPATH,"/html/body/span/span/span[1]/input").send_keys(Keys.ENTER)
-            #INDICATIVO
-            driver.find_element(By.XPATH,'//*[@id="select2-Prefix-container"]').click()
-            time.sleep(1)
-            driver.find_element('xpath','/html/body/span/span/span[1]/input').send_keys("1")#tipo
-            driver.find_element(By.XPATH,"/html/body/span/span/span[1]/input").send_keys(Keys.ENTER)
-            time.sleep(1)
-            accion = ActionChains(driver)
-            accion.double_click(driver.find_element('xpath','//*[@id="PhoneNumber"]')).perform()
-            time.sleep(1)
-            driver.find_element('xpath','//*[@id="PhoneNumber"]').send_keys(1111111)#//*[@id="PhoneNumber"]
-            time.sleep(1) 
-            break
+            try:
+                div=driver.find_element(By.ID,"group_4")
+                driver.find_element(By.ID,"PhoneId").click()
+                lista=driver.find_element(By.ID,"PhoneId")
+                # Localizar el elemento de la lista desplegable por su XPath
+                # Crear un objeto Select para el elemento de la lista desplegable
+                select = Select(lista)
+                # Seleccionar la opción "Nuevo" por su valor
+                select.select_by_visible_text("Nuevo...")
+                div.click()
+                #//*[@id="PhoneClass"]
+                time.sleep(1)
+                driver.find_element(By.ID,"PhoneClass").click()
+                lista=driver.find_element(By.ID,"PhoneClass")
+                #fijo
+                select= Select(lista)
+                # Seleccionar la opción "Nuevo" por su valor
+                time.sleep(1)
+                select.select_by_visible_text("Fijo")
+                div.click()
+                #1
+                driver.find_element(By.ID,"Prefix").click()
+                lista=driver.find_element(By.ID,"Prefix")
+                
+                #fijo
+                time.sleep(1)
+                select = Select(lista)
+                # Seleccionar la opción "Nuevo" por su valor
+                select.select_by_visible_text("1")
+
+                accion = ActionChains(driver)
+                accion.double_click(driver.find_element(By.ID,"PhoneNumber")).perform()
+                time.sleep(1)
+                driver.find_element(By.ID,"PhoneNumber").send_keys(1111111)
+                time.sleep(1)
+                #INFORMACION DE PORTABILIDAD
+                break
+            except:
+                nuevo.click()
+                #escribir nuevo: 
+                driver.find_element(By.XPATH,"/html/body/span/span/span[1]/input").send_keys("NUEVO")#/html/body/span/span/span[1]/input
+                driver.find_element(By.XPATH,"/html/body/span/span/span[1]/input").send_keys(Keys.ENTER)
+                time.sleep(1)
+                #//*[@id="select2-PhoneClass-container"] TIPO
+                driver.find_element('xpath','//*[@id="select2-PhoneClass-container"]').click()
+                time.sleep(1)
+                driver.find_element('xpath','/html/body/span/span/span[1]/input').send_keys("FIJO")#FIJO
+                driver.find_element(By.XPATH,"/html/body/span/span/span[1]/input").send_keys(Keys.ENTER)
+                #INDICATIVO
+                driver.find_element(By.XPATH,'//*[@id="select2-Prefix-container"]').click()
+                time.sleep(1)
+                driver.find_element('xpath','/html/body/span/span/span[1]/input').send_keys("1")#tipo
+                driver.find_element(By.XPATH,"/html/body/span/span/span[1]/input").send_keys(Keys.ENTER)
+                time.sleep(1)
+                accion = ActionChains(driver)
+                accion.double_click(driver.find_element('xpath','//*[@id="PhoneNumber"]')).perform()
+                time.sleep(1)
+                driver.find_element('xpath','//*[@id="PhoneNumber"]').send_keys(1111111)#//*[@id="PhoneNumber"]
+                time.sleep(1) 
+                break
         except:
             try:
                 #PENDIENTE DE VER SU EJECUCION 
@@ -336,14 +362,13 @@ def forms2(correo,plan,reglist,selleccion,numlist,minimo):
                 break
             except:
                 cone+=1
-
     #para generar error en caso de que los elementos no se hagan presentes
     if cone>=4:
         complemento="error lista desplegable"
         driver.find_element('xpath','//*[@id="DetailProduct_Iccid"]').click()
         
         print("eror al diligenciar campos")
-    
+    complemento=complemento
     #pospago boton de seleccion
     seleccionado=""
     time.sleep(2)
@@ -356,6 +381,7 @@ def forms2(correo,plan,reglist,selleccion,numlist,minimo):
             seleccionado="si"
             break
         except:
+              
             continue
     if seleccionado!="si":
         cone=0
@@ -451,8 +477,11 @@ def forms2(correo,plan,reglist,selleccion,numlist,minimo):
             time.sleep(2)
             paso="si"
         except:
-            paso="no" 
-            cone+=1
+            try:
+                driver.find_element(By.XPATH,'//*[@id="CampaignsViewModel_SelectedCampaigns"]').click()
+            except:
+                paso="no" 
+                cone+=1
         if paso=="si" or cone>=8:
             break
  
@@ -469,6 +498,7 @@ def forms2(correo,plan,reglist,selleccion,numlist,minimo):
             #activar  
             driver.find_element('xpath','//*[@id="btnNext"]').click()
             time.sleep(2)
+            complemento="rechazo enviado"
             break
         except:
             cone+=1
@@ -478,29 +508,64 @@ def forms2(correo,plan,reglist,selleccion,numlist,minimo):
         driver.find_element('xpath','//*[@id="PhoneNumber"]').click()
         complemento="error al momento de enviar el rechazo(pago minimo)"
         minimo.append(cedula)
-
+    else:
+        complemento="rechazo enviado"
     print(f"rechazo enviado")
     print(f"cedula: {cedula}")
     complemento="rechazo enviado"
-    reglist.append(cedula)
+    print("complemento")
+    acept="no"    
     cone=0
-    while cone<=3:
+    time.sleep(3)
+    modal = WebDriverWait(driver, 10).until(
+    EC.presence_of_element_located((By.ID, "MsgModal"))
+    )
+    button = modal.find_element(By.XPATH,'//*[@id="MsgModal"]/div/button[2]')#//*[@id="MsgModal"]/div/button[2]
+    time.sleep(1)
+    button.click()
+
+    while cone<=4:
         try:
-            #pasos finales 
-            time.sleep(3)
             modal = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.ID, "MsgModal"))
             )
             button = modal.find_element(By.XPATH,'//*[@id="MsgModal"]/div/button[2]')#//*[@id="MsgModal"]/div/button[2]
             time.sleep(1)
             button.click()
-            driver.switch_to.default_content()
+
+            #pasos finales 
+            button.click()
             #driver.find_element('xpath','//*[@id="btnPrev"]').click() //*[@id="btnPrev"]
+            acept="si"
             break
         except:
             cone+=1
-    if cone>=3:  
+    
+    while acept !="si":
+        try:
+            modal = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.ID, "MsgModal"))
+            )
+            button = modal.find_element(By.XPATH,'//*[@id="MsgModal"]/div/button[2]')#//*[@id="MsgModal"]/div/button[2]
+            time.sleep(1)
+            button.click()
+            modal.find_element(By.XPATH,'//*[@id="MsgModal"]/div/button[2]').click()
+            acept="si"
+            cone=0
+            break
+        except:
+            cone+=1
+            if cone>=8: 
+                break
+            continue
+
+    if acept=="si":
+        driver.switch_to.default_content()
+
+    if cone>=4:  
         driver.find_element(By.XPATH,'//*[@id="btnPrev"]').click()
+
+
     #lineas de codigo para generar un regreso en la pagina en caso de intermitencias
     cone=0
     while cone<=3:
@@ -686,7 +751,11 @@ with open('BASEP2.csv', 'w', encoding='utf-8', newline='') as archivo:
             except Exception as e:
                 print('excepcion')
         finally:
-            datosfila=(f"{cedula}:  {complemento}")
+            
+            complemento=unidecode(complemento)
+            complement=complemento.split(":")
+            comple=complement[1]
+            datosfila=(f"{cedula}:  {comple}")
             print(datosfila)
             archivo.write(datosfila + '\n')
             archivo.flush()
