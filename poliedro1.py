@@ -732,6 +732,8 @@ with open('BASEP2.csv', 'w', encoding='utf-8', newline='') as archivo:
             forms2(correo,plan,selleccion)
             contador=contador+1
         except:
+            if complemento=="sim adquirida":
+                continue
             try:
                 inicio()
                 time.sleep(1)
