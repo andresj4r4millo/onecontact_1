@@ -190,11 +190,17 @@ def validaciones():
             cone+=1
             continue 
     if cone>=4:
+        
         try:
+            
             #//*[@id="validationResponses"]/div[5]/div[2]/div[11]/div/div[2]/div[1]
             validaciones=driver.find_element(By.ID,'viewErrors')
             validacion=validaciones.text
             complemento=validacion
+            porta = driver.find_element(By.XPATH, '//*[@id="viewErrors"]/ul/li[2]')
+            portabilidad=porta.text
+            if 'Solicitud Portabilidad Numerica = Falso' in portabilidad:
+                complemento='Solicitud Portabilidad Numerica = Falso'
         except:
             #//*[@id="validationResponses"]/div[5]/div[2]/div[11]/div/div[2]/div[1]
             validaciones=driver.find_element(By.ID,'validationResponses')
@@ -732,7 +738,10 @@ with open('BASEP2.csv', 'w', encoding='utf-8', newline='') as archivo:
             forms2(correo,plan,selleccion)
             contador=contador+1
         except:
+            
             if complemento=="sim adquirida":
+                continue
+            if "Solicitud Portabilidad Numerica = Falso" in complemento:
                 continue
             try:
                 inicio()
@@ -744,15 +753,20 @@ with open('BASEP2.csv', 'w', encoding='utf-8', newline='') as archivo:
             except Exception as e:
                 print('excepcion')
         finally:
-            
-            complemento=unidecode(complemento)
-            complement=complemento.split(":")
-            comple=complement[1]
-            datosfila=(f"{cedula}:  {comple}")
-            print(datosfila)
-            archivo.write(datosfila + '\n')
-            archivo.flush()
-            time.sleep(1)
+            if "Solicitud Portabilidad Numerica = Falso" in complemento:
+                datosfila=(f"{cedula}:  {complemento}")
+                print(datosfila)
+                archivo.write(datosfila + '\n')
+                archivo.flush()
+            else:
+                complemento=unidecode(complemento)
+                complement=complemento.split(":")
+                comple=complement[1]
+                datosfila=(f"{cedula}:  {comple}")
+                print(datosfila)
+                archivo.write(datosfila + '\n')
+                archivo.flush()
+                time.sleep(1)
             print("one contact")
 
 driver.close()
