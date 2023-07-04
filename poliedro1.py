@@ -93,7 +93,7 @@ def formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim):
     
     
     if cone>=6:
-        driver.find_element('xpath',"/html/body/span/span/span[2]/ul/li[2]").click()
+        return "pagina no cargo"
 
     #llenar los ultimos datos y dar click en el boton de realizar consulta
     try:
@@ -135,7 +135,7 @@ def formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim):
                     sim_adquirida=driver.find_element(By.XPATH,'//*[@id="DetailProduct_MinBroughtPortability"]')
                     sim_adquirida.click()
                     print("sim adquirida")
-                    complemento="sim adquirida"
+                    complement="sim adquirida"
                     cone=8
                     break  
                 except:
@@ -161,11 +161,12 @@ def formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim):
     #ESTAS LINEAS DE CODIGO GENERARAN ERROR SI LA PAGINA NO REALIZA LA CONSULTA DESPUES DE 6 INTENTOS
 
     if cone>=8:
-        driver.find_element(By.XPATH,'//*[@id="PersonalInfo_ProductDonorOperator"]').click()
-    elif complemento=="sim adquirida":
-        driver.find_element(By.XPATH,'//*[@id="PersonalInfo_ProductDonorOperator"]').click()
+        return "consulta no realizada"
+    elif complement=="sim adquirida":
+        return "sim adquirida"
     elif paso=="si":
         print("en espera por validacion")
+        return None
 
     
 
@@ -196,19 +197,18 @@ def validaciones():
             #//*[@id="validationResponses"]/div[5]/div[2]/div[11]/div/div[2]/div[1]
             validaciones=driver.find_element(By.ID,'viewErrors')
             validacion=validaciones.text
-            complemento=validacion
             porta = driver.find_element(By.XPATH, '//*[@id="viewErrors"]/ul/li[2]')
             portabilidad=porta.text
             if 'Solicitud Portabilidad Numerica = Falso' in portabilidad:
-                complemento='Solicitud Portabilidad Numerica = Falso'
+                validacion='Solicitud Portabilidad Numerica = Falso'
         except:
             #//*[@id="validationResponses"]/div[5]/div[2]/div[11]/div/div[2]/div[1]
             validaciones=driver.find_element(By.ID,'validationResponses')
             validacion=validaciones.text
-            complemento=validacion
             
- 
-        driver.find_element('xpath','//*[@id="DetailProduct_MinBroughtPortability"]').click()  
+        return  str(validacion)
+    else:
+        return None
 
 
 ####FORMULARIO 3#####
@@ -248,8 +248,7 @@ def forms2(correo,plan,selleccion):
     
     #para generar error en caso de que los elementos no se hagan presentes
     if cone>=4:
-        complemento="los elementos no ubicados"
-        driver.find_element('xpath','//*[@id="DetailProduct_Iccid"]').click()
+        return "elementos no ubicados"
 
 
     cone=0
@@ -363,11 +362,9 @@ def forms2(correo,plan,selleccion):
                 cone+=1
     #para generar error en caso de que los elementos no se hagan presentes
     if cone>=4:
-        complemento="error lista desplegable"
-        driver.find_element('xpath','//*[@id="DetailProduct_Iccid"]').click()
-        
-        print("eror al diligenciar campos")
-    complemento=complemento
+        return "error lista desplegable"
+
+    
     #pospago boton de seleccion
     seleccionado=""
     time.sleep(2)
@@ -429,8 +426,8 @@ def forms2(correo,plan,selleccion):
                 cone+=1
 
     if  cone>=4:
-        complemento="correo no valido"
-        driver.find_element('xpath','//*[@id="DetailProduct_MinBroughtPortability"]').click()
+        return "correo no valido"
+        
 
     cone=0
     while cone<=6:
@@ -459,8 +456,8 @@ def forms2(correo,plan,selleccion):
 
     if  cone>=6:
 
-        complemento="correo no valido"
-        driver.find_element('xpath','//*[@id="DetailProduct_MinBroughtPortability"]').click()
+        return "correo no valido"
+
 
     #SELECCIONAR CAMPAÑA DE BENEFICIOS  
     paso="no"
@@ -561,18 +558,23 @@ def forms2(correo,plan,selleccion):
 
     if cone>=4:  
         driver.find_element(By.XPATH,'//*[@id="btnPrev"]').click()
-
+        return "enviado"
+    
 
     #lineas de codigo para generar un regreso en la pagina en caso de intermitencias
     cone=0
     while cone<=3:
         try:
             driver.find_element(By.XPATH,'//*[@id="btnPrev"]').click()
+
             break
         except:
             cone+=1
     if cone>=3:  
         driver.find_element(By.XPATH,'//*[@id="btnPrev"]').click()
+        return "enviado"
+    else:
+        return "enviado"
     
     
     
@@ -641,7 +643,9 @@ def inicio():
         except:
             con+=1
         if con==4:
-            driver.find_element('xpath','//*[@id="ctl00_ContentPlaceHolder1_BtnRegresarMensaje"]').click()
+            return "pagina no carga"
+        else:
+            None
 
 ##ESTAS LINEAS DE CODIGO RECIBEN LOS DATOS DE LA FECHA A PORTAR Y LA CEDULA, YA QUE 
 #LA CEDULA DEL ASESOR QUE SE CARGA A LA BASE NO SIEMPRE ES APTA PARA DILIGENCIAR LOS FORMULARIOS
@@ -730,44 +734,45 @@ with open('BASEP2.csv', 'w', encoding='utf-8', newline='') as archivo:
         #ciclo
         #EL CICLO SE REPITE EN CASO DE ERROR POR SI LOS ELEMENTOS DE LA PAGINA NO CARGAN Y SE GENERA ALGUN ERROR
         #  PARA NO PASAR POR ALTO EL REGISTRO
-        try:
+        
+        inicio()
+        time.sleep(1)
+        complemento=formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim)
+        if complemento != "":
+            complemento=validaciones()
+            if complemento !="":
+                complemento=forms2(correo,plan,selleccion)    
+
+        if "Solicitud Portabilidad Numerica = Falso" in complemento:
+            datosfila=(f"{cedula}:  {complemento}")
+            print(datosfila)
+            archivo.write(datosfila + '\n')
+            archivo.flush()
+        elif complemento=="error lista desplegable":
             inicio()
             time.sleep(1)
-            formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim)
-            validaciones()
-            forms2(correo,plan,selleccion)
-            contador=contador+1
-        except:
-            
-            if complemento=="sim adquirida":
-                continue
-            if "Solicitud Portabilidad Numerica = Falso" in complemento:
-                continue
-            try:
-                inicio()
-                time.sleep(1)
-                formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim)
-                validaciones()
-                forms2(correo,plan,selleccion)
-                contador=contador+1
-            except Exception as e:
-                print('excepcion')
-        finally:
-            if "Solicitud Portabilidad Numerica = Falso" in complemento:
-                datosfila=(f"{cedula}:  {complemento}")
-                print(datosfila)
-                archivo.write(datosfila + '\n')
-                archivo.flush()
-            else:
-                complemento=unidecode(complemento)
-                complement=complemento.split(":")
-                comple=complement[1]
-                datosfila=(f"{cedula}:  {comple}")
-                print(datosfila)
-                archivo.write(datosfila + '\n')
-                archivo.flush()
-                time.sleep(1)
-            print("one contact")
+            complemento=formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim)
+            if complemento != "":
+                complemento=validaciones()
+                if complemento !="":
+                    complemento=forms2(correo,plan,selleccion) 
+            datosfila=(f"{cedula}:  {complemento}")
+            print(datosfila)
+            archivo.write(datosfila + '\n')
+            archivo.flush()
+        else:
+            complemento=unidecode(complemento)
+            complement=complemento.split(":")
+            comple=complement[1]
+            datosfila=(f"{cedula}:  {comple}")
+            print(datosfila)
+            archivo.write(datosfila + '\n')
+            archivo.flush()
+            time.sleep(1)  
+    
+           
+
+
 
 driver.close()
 
