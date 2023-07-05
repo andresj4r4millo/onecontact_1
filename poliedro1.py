@@ -18,23 +18,7 @@ from selenium.webdriver.support.ui import Select
 model_e="MOTOROLA"
 cone=0
 
-dicplan={}
-workbook = openpyxl.load_workbook('CAMPAÑAS.xlsx', read_only=True, data_only=True, keep_links=False, keep_vba=False)
-# Seleccionar la hoja de cálculo que deseas leer
-sheet = workbook['BENEFICIOS']
 
-# Iterar sobre las filas en la hoja de cálculo
-for index, row in enumerate(sheet.iter_rows(values_only=True), start=1):
-    if index==1:
-        continue
-    CLAVE=str(row[0])
-    VALOR = str(row[1]) 
-
-    dicplan[CLAVE]=str(VALOR)
-
-print("diccionario, campañas de beneficios")
-for opera, campaña in dicplan.items():
-    print(opera, campaña)
 
 complemento=""
 
@@ -166,7 +150,7 @@ def formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim):
         return "sim adquirida"
     elif paso=="si":
         print("en espera por validacion")
-        return None
+        return ""
 
     
 
@@ -208,7 +192,7 @@ def validaciones():
             
         return  str(validacion)
     else:
-        return None
+        return ""
 
 
 ####FORMULARIO 3#####
@@ -645,7 +629,7 @@ def inicio():
         if con==4:
             return "pagina no carga"
         else:
-            None
+            return ""
 
 ##ESTAS LINEAS DE CODIGO RECIBEN LOS DATOS DE LA FECHA A PORTAR Y LA CEDULA, YA QUE 
 #LA CEDULA DEL ASESOR QUE SE CARGA A LA BASE NO SIEMPRE ES APTA PARA DILIGENCIAR LOS FORMULARIOS
@@ -701,39 +685,31 @@ with open('BASEP2.csv', 'w', encoding='utf-8', newline='') as archivo:
         nip=str(nipn).rjust(5,"0")
         
         #condicion sellecion
-
-        if convergencia=="SI" and operador=="WOM":
-            sellecion=dicplan['WOM']
-        elif convergencia=="NO" and operador=="WOM":
-            selleccion=dicplan['WOMNO'] 
-        elif convergencia=="SI" and operador=="MOVISTAR":
-            selleccion=dicplan['MOVISTAR']
-        elif convergencia=="NO" and operador=="MOVISTAR":
-            selleccion=dicplan['MOVISTARNO']
-        elif convergencia=="SI" and operador=="TIGO":
-            selleccion=dicplan['TIGO']
-        elif convergencia=="NO" and operador=="TIGO":
-            selleccion=dicplan['TIGONO']
-        elif convergencia=="NO" and operador=="ETB":
-            selleccion=dicplan["ETBNO"]
-        elif convergencia=="SI" and operador=="ETB":
-            selleccion=dicplan["ETB"] 
-        elif convergencia=="NO" and operador=="AVANTEL":
-            selleccion=dicplan["AVANTELNO"]   
-        elif convergencia=="SI" and operador=="AVANTEL":
-            selleccion=dicplan["AVANTEL"]
-        else:
-            sellecion='/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div/div[5]/div/div/div/div[2]/div[2]/fieldset/div[1]/span/span/input'
-
         cedula=str(cc)
         plan=str(planb)
 
-        
-   
-        
+        match = re.search(r'\d{5}', plan)
+
+        if match:
+            tu_plan_deseado = match.group()
+        #seleccion
         #ciclo
-        #EL CICLO SE REPITE EN CASO DE ERROR POR SI LOS ELEMENTOS DE LA PAGINA NO CARGAN Y SE GENERA ALGUN ERROR
-        #  PARA NO PASAR POR ALTO EL REGISTRO
+        data_frame = pd.read_excel('CAMPAÑASB.xlsx', sheet_name='Hoja1')
+
+        # Filtra el DataFrame para obtener la fila deseada
+        fila_deseada = data_frame.loc[(data_frame['PLAN'] == tu_plan_deseado) & (data_frame['OPERADOR'] == operador)]
+
+        # Verifica si se encontró una coincidencia
+        if not fila_deseada.empty:
+            # Obtiene el dato correspondiente según la convergencia
+            if convergencia == "SI":
+                seleccion = str(fila_deseada['SI'].iloc[0])
+            else:
+                seleccion = str(fila_deseada['NO'].iloc[0])
+        else:
+            # Si no se encontró una coincidencia, asigna una selección por defecto
+            seleccion = "/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div/div[5]/div/div/div/div[2]/div[10]/fieldset/div[1]/span/span/input"
+
         
         inicio()
         time.sleep(1)
@@ -741,7 +717,7 @@ with open('BASEP2.csv', 'w', encoding='utf-8', newline='') as archivo:
         if complemento != "":
             complemento=validaciones()
             if complemento !="":
-                complemento=forms2(correo,plan,selleccion)    
+                complemento=forms2(correo,plan,seleccion)    
 
         if "Solicitud Portabilidad Numerica = Falso" in complemento:
             datosfila=(f"{cedula}:  {complemento}")
@@ -755,7 +731,7 @@ with open('BASEP2.csv', 'w', encoding='utf-8', newline='') as archivo:
             if complemento != "":
                 complemento=validaciones()
                 if complemento !="":
-                    complemento=forms2(correo,plan,selleccion) 
+                    complemento=forms2(correo,plan,seleccion) 
             datosfila=(f"{cedula}:  {complemento}")
             print(datosfila)
             archivo.write(datosfila + '\n')
