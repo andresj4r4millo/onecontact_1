@@ -692,12 +692,14 @@ with open('BASEP2.csv', 'w', encoding='utf-8', newline='') as archivo:
 
         if match:
             tu_plan_deseado = match.group()
+        mi_plan=int(tu_plan_deseado)
         #seleccion
         #ciclo
+        print(f"{operador}, {mi_plan}, {convergencia}")
         data_frame = pd.read_excel('CAMPAÑASB.xlsx', sheet_name='Hoja1')
 
         # Filtra el DataFrame para obtener la fila deseada
-        fila_deseada = data_frame.loc[(data_frame['PLAN'] == tu_plan_deseado) & (data_frame['OPERADOR'] == operador)]
+        fila_deseada = data_frame.loc[(data_frame['PLAN'] == mi_plan) & (data_frame['OPERADOR'] == operador)]
 
         # Verifica si se encontró una coincidencia
         if not fila_deseada.empty:
@@ -709,7 +711,6 @@ with open('BASEP2.csv', 'w', encoding='utf-8', newline='') as archivo:
         else:
             # Si no se encontró una coincidencia, asigna una selección por defecto
             seleccion = "/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div/div[5]/div/div/div/div[2]/div[10]/fieldset/div[1]/span/span/input"
-
         
         inicio()
         time.sleep(1)
