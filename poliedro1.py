@@ -20,16 +20,16 @@ cone=0
 
 
 
-complemento=""
+
 
 def formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim):
-    global complemento
+
     paso="no"
     #primeros pasos, primer formulario
     #while con el fin de no lanzar error si el script no encuentra los elementos en la pagina
     cone=0
     while cone<6:
-            print(f"iteracion: {str(cone)}")
+
             try:
                 #FORMULARIO 1
                 #LLENAR CEDULA //*[@id="DetailProduct_DocumentNumber"]porta = driver.find_element(By.XPATH, '//*[@id="viewErrors"]/ul/li[2]')
@@ -157,7 +157,7 @@ def formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim):
     
 #ESTA FUNCION EVALUARA SI EL RECHAZO PASA O NO, Y EL PORQUE, PARA SEGMENTARLO POR LISTAS
 def validaciones(): 
-    global complemento
+
     cone=0
     while cone<4:
         try:
@@ -194,7 +194,6 @@ def validaciones():
 
 
 def forms2(correo,plan,selleccion):
-    global complemento
 
     cone=0
     while True:
@@ -692,6 +691,8 @@ with open('BASEP2.csv', 'w', encoding='utf-8', newline='') as archivo:
             # Si no se encontró una coincidencia, asigna una selección por defecto
             seleccion = "/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div/div[5]/div/div/div/div[2]/div[10]/fieldset/div[1]/span/span/input"
         complemento=""
+
+
         inicio()
         time.sleep(1)
         complemento=formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim)
