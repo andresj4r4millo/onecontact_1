@@ -78,7 +78,7 @@ def formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim):
     
     if cone>=6:
         return "pagina no cargo"
-
+    complement=""
     #llenar los ultimos datos y dar click en el boton de realizar consulta
     try:
 
@@ -174,22 +174,14 @@ def validaciones():
             #regresar
             cone+=1
             continue 
-    if cone>=4:
-        
+    if cone>=4:   
         try:
-            
-            #//*[@id="validationResponses"]/div[5]/div[2]/div[11]/div/div[2]/div[1]
-            validaciones=driver.find_element(By.ID,'viewErrors')
-            validacion=validaciones.text
             porta = driver.find_element(By.XPATH, '//*[@id="viewErrors"]/ul/li[2]')
-            portabilidad=porta.text
-            if 'Solicitud Portabilidad Numerica = Falso' in portabilidad:
-                validacion='Solicitud Portabilidad Numerica = Falso'
+            validacion=porta.text
         except:
             #//*[@id="validationResponses"]/div[5]/div[2]/div[11]/div/div[2]/div[1]
-            validaciones=driver.find_element(By.ID,'validationResponses')
-            validacion=validaciones.text
-            
+            validaciones=driver.find_element(By.XPATH, '//*[@id="viewErrors"]/ul/li[2]')
+            validacion=validaciones.text   
         return  str(validacion)
     else:
         return ""
@@ -223,13 +215,9 @@ def forms2(correo,plan,selleccion):
             driver.find_element('xpath','//*[@id="PersonalInfo_Email"]').send_keys(correo)
             time.sleep(1)
             #NUMERO DE TELEFONO 
-            
-
-            
             break
         except:
             cone+=1
-    
     #para generar error en caso de que los elementos no se hagan presentes
     if cone>=4:
         return "elementos no ubicados"
@@ -360,8 +348,7 @@ def forms2(correo,plan,selleccion):
             print("pospago seleccionado")
             seleccionado="si"
             break
-        except:
-              
+        except:  
             continue
     if seleccionado!="si":
         cone=0
@@ -439,7 +426,6 @@ def forms2(correo,plan,selleccion):
     #para generar error en caso de que la pagina no cargue ningun elemento
 
     if  cone>=6:
-
         return "correo no valido"
 
 
@@ -462,6 +448,7 @@ def forms2(correo,plan,selleccion):
                 paso="no" 
                 cone+=1
         if paso=="si" or cone>=8:
+
             break
  
     #PASOS PARA ENVIAR EL RECHAZO A LA BASE
@@ -485,7 +472,7 @@ def forms2(correo,plan,selleccion):
         driver.find_element(By.XPATH,'//*[@id="btnPrev"]').click()
         time.sleep(1)
         driver.find_element('xpath','//*[@id="PhoneNumber"]').click()
-        complemento="error al momento de enviar el rechazo(pago minimo)"
+        return"error al momento de enviar el rechazo(pago minimo)"
     else:
         complemento="rechazo enviado"
     print(f"rechazo enviado")
@@ -539,26 +526,19 @@ def forms2(correo,plan,selleccion):
 
     if acept=="si":
         driver.switch_to.default_content()
-
-    if cone>=4:  
-        driver.find_element(By.XPATH,'//*[@id="btnPrev"]').click()
-        return "enviado"
+    while True:
+        try:
+            if cone>=4:  
+                driver.find_element(By.XPATH,'//*[@id="btnPrev"]').click()
+                return "enviado"
+            else:
+                driver.find_element(By.XPATH,'//*[@id="btnPrev"]').click()
+                return "enviado"
+        except:
+            return "enviado"
+    #lineas de codigo para generar un regreso en la pagina en caso de intermitencias
     
 
-    #lineas de codigo para generar un regreso en la pagina en caso de intermitencias
-    cone=0
-    while cone<=3:
-        try:
-            driver.find_element(By.XPATH,'//*[@id="btnPrev"]').click()
-
-            break
-        except:
-            cone+=1
-    if cone>=3:  
-        driver.find_element(By.XPATH,'//*[@id="btnPrev"]').click()
-        return "enviado"
-    else:
-        return "enviado"
     
     
     
@@ -711,41 +691,29 @@ with open('BASEP2.csv', 'w', encoding='utf-8', newline='') as archivo:
         else:
             # Si no se encontró una coincidencia, asigna una selección por defecto
             seleccion = "/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div/div[5]/div/div/div/div[2]/div[10]/fieldset/div[1]/span/span/input"
-        
+        complemento=""
         inicio()
         time.sleep(1)
         complemento=formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim)
-        if complemento != "":
+        if complemento == "":
             complemento=validaciones()
-            if complemento !="":
-                complemento=forms2(correo,plan,seleccion)    
-
-        if "Solicitud Portabilidad Numerica = Falso" in complemento:
-            datosfila=(f"{cedula}:  {complemento}")
-            print(datosfila)
-            archivo.write(datosfila + '\n')
-            archivo.flush()
-        elif complemento=="error lista desplegable":
+            if complemento =="":
+                complemento=forms2(correo,plan,seleccion)
+        if complemento=="error lista desplegable":
             inicio()
-            time.sleep(1)
             complemento=formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim)
-            if complemento != "":
+            if complemento == "":
                 complemento=validaciones()
-                if complemento !="":
-                    complemento=forms2(correo,plan,seleccion) 
-            datosfila=(f"{cedula}:  {complemento}")
-            print(datosfila)
-            archivo.write(datosfila + '\n')
-            archivo.flush()
-        else:
-            complemento=unidecode(complemento)
-            complement=complemento.split(":")
-            comple=complement[1]
-            datosfila=(f"{cedula}:  {comple}")
-            print(datosfila)
-            archivo.write(datosfila + '\n')
-            archivo.flush()
-            time.sleep(1)  
+                if complemento =="":
+                    complemento=forms2(correo,plan,seleccion)
+
+        #escribir en el libro
+        datosfila=(f"{cedula}:  {complemento}")
+        print(datosfila)
+        archivo.write(datosfila + '\n')
+        archivo.flush()
+        print("onecontact")
+        continue
     
            
 
