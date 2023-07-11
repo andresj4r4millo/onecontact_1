@@ -78,7 +78,7 @@ def formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim):
     
     if cone>=6:
         return "pagina no cargo"
-    complement=""
+
     #llenar los ultimos datos y dar click en el boton de realizar consulta
     try:
 
@@ -525,6 +525,7 @@ def forms2(correo,plan,selleccion):
 
     if acept=="si":
         driver.switch_to.default_content()
+        #return "enviado"
     while True:
         try:
             if cone>=4:  
