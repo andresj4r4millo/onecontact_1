@@ -463,23 +463,25 @@ def forms2(correo,plan,selleccion):
             #activar  
             driver.find_element('xpath','//*[@id="btnNext"]').click()
             time.sleep(2)
-            complemento="rechazo enviado"
             break
         except:
             cone+=1
     if cone>=3:
-        driver.find_element(By.XPATH,'//*[@id="btnPrev"]').click()
-        time.sleep(1)
-        driver.find_element('xpath','//*[@id="PhoneNumber"]').click()
-        return"error al momento de enviar el rechazo(pago minimo)"
-    else:
-        complemento="rechazo enviado"
+        try:
+
+            driver.find_element(By.XPATH,'//*[@id="btnPrev"]').click()
+            time.sleep(1)
+            return"error al momento de enviar el rechazo(pago minimo)"
+        except:
+            driver.find_element(By.XPATH,'//*[@id="btnPrev"]').click()
+            time.sleep(1)
+            return"error al momento de enviar el rechazo(pago minimo)"
+
     print(f"rechazo enviado")
     print(f"cedula: {cedula}")
-    complemento="rechazo enviado"
-    print("complemento")
     acept="no"    
     cone=0
+    """
     time.sleep(3)
     modal = WebDriverWait(driver, 10).until(
     EC.presence_of_element_located((By.ID, "MsgModal"))
@@ -487,7 +489,9 @@ def forms2(correo,plan,selleccion):
     button = modal.find_element(By.XPATH,'//*[@id="MsgModal"]/div/button[2]')#//*[@id="MsgModal"]/div/button[2]
     time.sleep(1)
     button.click()
+    print("enviado)
 
+    """
     while cone<=4:
         try:
             modal = WebDriverWait(driver, 10).until(
@@ -504,7 +508,7 @@ def forms2(correo,plan,selleccion):
             break
         except:
             cone+=1
-    
+    cone=0
     while acept !="si":
         try:
             modal = WebDriverWait(driver, 10).until(
