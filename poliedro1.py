@@ -733,10 +733,10 @@ with open('BASEP2.csv', 'w', encoding='utf-8', newline='') as archivo:
             complemento=inicio()
             if complemento=="":
                 complemento=formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim)
-                if complemento == "":
-                    complemento=validaciones()
-                    if complemento =="":
-                        complemento=forms2(correo,plan,seleccion)
+            if complemento == "":
+                complemento=validaciones()
+                if complemento =="":
+                    complemento=forms2(correo,plan,seleccion)
 
         #escribir en el libro
         datosfila=(f"{cedula}:  {complemento}")
