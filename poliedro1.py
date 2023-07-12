@@ -452,7 +452,7 @@ def forms2(correo,plan,selleccion):
  
     #PASOS PARA ENVIAR EL RECHAZO A LA BASE
     cone=0
-    while cone<=3:
+    while cone<=4:
         try:
             time.sleep(2)
             #CONTINUAR //*[@id="btnNext"]
@@ -466,7 +466,7 @@ def forms2(correo,plan,selleccion):
             break
         except:
             cone+=1
-    if cone>=3:
+    if cone>=4:
         try:
 
             driver.find_element(By.XPATH,'//*[@id="btnPrev"]').click()
@@ -530,6 +530,29 @@ def forms2(correo,plan,selleccion):
     if acept=="si":
         driver.switch_to.default_content()
         #return "enviado"
+    else:
+        try:
+
+            modal = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.ID, "MsgModal"))
+            )
+            button = modal.find_element(By.XPATH,'//*[@id="MsgModal"]/div/button[2]')#//*[@id="MsgModal"]/div/button[2]
+            time.sleep(1)
+            button.click()
+            #modal.find_element(By.XPATH,'//*[@id="MsgModal"]/div/button[2]').click()
+            acept="si"
+            driver.switch_to.default_content()
+        except:
+
+            modal = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.ID, "MsgModal"))
+            )
+            button = modal.find_element(By.XPATH,'//*[@id="MsgModal"]/div/button[2]')#//*[@id="MsgModal"]/div/button[2]
+            time.sleep(1)
+            button.click()
+            acept="si"
+            driver.switch_to.default_content()
+
     while True:
         try:
             if cone>=4:  
@@ -698,20 +721,22 @@ with open('BASEP2.csv', 'w', encoding='utf-8', newline='') as archivo:
         complemento=""
 
 
-        inicio()
+        complemento=inicio()
         time.sleep(1)
-        complemento=formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim)
-        if complemento == "":
-            complemento=validaciones()
-            if complemento =="":
-                complemento=forms2(correo,plan,seleccion)
-        if complemento=="error lista desplegable":
-            inicio()
+        if complemento=="":
             complemento=formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim)
             if complemento == "":
                 complemento=validaciones()
                 if complemento =="":
                     complemento=forms2(correo,plan,seleccion)
+        if complemento=="error lista desplegable":
+            complemento=inicio()
+            if complemento=="":
+                complemento=formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim)
+                if complemento == "":
+                    complemento=validaciones()
+                    if complemento =="":
+                        complemento=forms2(correo,plan,seleccion)
 
         #escribir en el libro
         datosfila=(f"{cedula}:  {complemento}")
