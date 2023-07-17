@@ -23,7 +23,7 @@ cone=0
 
 
 def formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim):
-
+    complement=""
     paso="no"
     #primeros pasos, primer formulario
     #while con el fin de no lanzar error si el script no encuentra los elementos en la pagina
@@ -37,18 +37,20 @@ def formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim):
                 time.sleep(2)
                 #ced=driver.find_element(By.XPATH('/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div[2]/div[1]/div[1]/div[2]/div/input'))
                 ced.send_keys(cedula)
-
+                ced.send_keys(Keys.ENTER)
+                time.sleep(1)
                 #LLENAR APELLIDO
                 driver.find_element('xpath','//*[@id="DetailProduct_LastName"]').clear()
 
                 driver.find_element('xpath','//*[@id="DetailProduct_LastName"]').send_keys(apellido)
+                driver.find_element('xpath','//*[@id="DetailProduct_LastName"]').send_keys(Keys.ENTER)
                 #NO TRAJO EQUIPO
                 #driver.find_element('xpath','//*[@id="DetailProduct_WithoutImeiRegistryCheck"]').click()
                 #CEDULA ASESOR
                 accion = ActionChains(driver)
                 accion.double_click(driver.find_element('xpath','//*[@id="DetailProduct_SellerId"]')).perform()
                 driver.find_element('xpath','//*[@id="DetailProduct_SellerId"]').send_keys(cedulaa)
-                time.sleep(1)
+                time.sleep(2)
                 #CHECK PORTABILIDAD NUMERICA    //*[@id="DetailProduct_PortabilityNumberCheck"]
                 driver.find_element('xpath','//*[@id="DetailProduct_PortabilityNumberCheck"]').click()
                 #ESPERAR A QUE CARGUE POLIEDRO
@@ -147,11 +149,12 @@ def formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim):
 
     if cone>=8:
         return "consulta no realizada"
-    elif complement=="sim adquirida":
-        return "sim adquirida"
     elif paso=="si":
         print("en espera por validacion")
         return ""
+    elif complement=="sim adquirida":
+        return "sim adquirida"
+    
 
     
 
