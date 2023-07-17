@@ -43,19 +43,19 @@ def formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim):
 
                 driver.find_element('xpath','//*[@id="DetailProduct_LastName"]').send_keys(apellido)
                 #NO TRAJO EQUIPO
-                driver.find_element('xpath','//*[@id="DetailProduct_WithoutImeiRegistryCheck"]').click()
+                #driver.find_element('xpath','//*[@id="DetailProduct_WithoutImeiRegistryCheck"]').click()
                 #CEDULA ASESOR
                 accion = ActionChains(driver)
                 accion.double_click(driver.find_element('xpath','//*[@id="DetailProduct_SellerId"]')).perform()
                 driver.find_element('xpath','//*[@id="DetailProduct_SellerId"]').send_keys(cedulaa)
                 time.sleep(1)
-                #CHECK PORTABILIDAD NUMERICA
+                #CHECK PORTABILIDAD NUMERICA    //*[@id="DetailProduct_PortabilityNumberCheck"]
                 driver.find_element('xpath','//*[@id="DetailProduct_PortabilityNumberCheck"]').click()
                 #ESPERAR A QUE CARGUE POLIEDRO
                 time.sleep(1)
-                #MIN A PORTAR
+                #MIN A PORTAR //*[@id="DetailProduct_PortabilityNumber"]
                 driver.find_element('xpath','//*[@id="DetailProduct_PortabilityNumber"]').send_keys(celular)
-                #NIP //*[@id="DetailProduct_NIP"]
+                #NIP                        //*[@id="DetailProduct_NIP"]
                 driver.find_element('xpath','//*[@id="DetailProduct_NIP"]').click()
                 driver.find_element(By.XPATH,'//*[@id="DetailProduct_NIP"]').send_keys(nip)
                 #FECHA DE PORTACION
@@ -66,22 +66,23 @@ def formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim):
                 campo_fecha.clear()
                 driver.execute_script(f'document.getElementById("DetailProduct_PortabilityDate").value = "{fechap}";')
                 #SERIAL SIM CARD
+                #serial equipo
+                driver.find_element(By.XPATH,'//*[@id="DetailProduct_WithoutImeiRegistryCheck"]').click()
                 accion = ActionChains(driver)
-                # /html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div[2]/div[1]/div[2]/div[2]/div/input
-                accion.double_click(driver.find_element('xpath',"/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div[2]/div[1]/div[2]/div[2]/div/input")).perform()
-                driver.find_element('xpath',"/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div[2]/div[1]/div[2]/div[2]/div/input").send_keys(serialsim)
-                break
+                # //*[@id="DetailProduct_Iccid"]
+                accion.double_click(driver.find_element('xpath','//*[@id="DetailProduct_Iccid"]')).perform()
+                driver.find_element('xpath','//*[@id="DetailProduct_Iccid"]').send_keys(serialsim)
+                break#                       /html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div[2]/div[1]/div[3]/div[2]/div/input
             except:
                 cone+=1
                 continue
-    
     
     if cone>=6:
         return "pagina no cargo"
 
     #llenar los ultimos datos y dar click en el boton de realizar consulta
     try:
-
+        ##//*[@id="DetailProduct_WithoutImeiRegistryCheck"]
         driver.find_element('xpath','//*[@id="DetailProduct_Iccid"]').click()
         driver.find_element('xpath','//*[@id="DetailProduct_Imei"]').click()        
         #ESPERAR A QUE CARGUE POLIEDRO 
@@ -633,10 +634,7 @@ def inicio():
             break
         except:
             con+=1
-        if con==4:
-            return "pagina no carga"
-        else:
-            return ""
+
 
 ##ESTAS LINEAS DE CODIGO RECIBEN LOS DATOS DE LA FECHA A PORTAR Y LA CEDULA, YA QUE 
 #LA CEDULA DEL ASESOR QUE SE CARGA A LA BASE NO SIEMPRE ES APTA PARA DILIGENCIAR LOS FORMULARIOS
@@ -721,16 +719,15 @@ with open('BASEP2.csv', 'w', encoding='utf-8', newline='') as archivo:
         complemento=""
 
 
-        complemento=inicio()
+        inicio()
         time.sleep(1)
-        if complemento=="":
-            complemento=formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim)
-            if complemento == "":
-                complemento=validaciones()
-                if complemento =="":
-                    complemento=forms2(correo,plan,seleccion)
+        complemento=formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim)
+        if complemento == "":
+            complemento=validaciones()
+            if complemento =="":
+                complemento=forms2(correo,plan,seleccion)
         if complemento=="error lista desplegable":
-            complemento=inicio()
+            inicio()
             if complemento=="":
                 complemento=formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim)
             if complemento == "":
