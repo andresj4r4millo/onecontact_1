@@ -700,6 +700,10 @@ with open('BASEP2.csv', 'w', encoding='utf-8', newline='') as archivo:
 
         if match:
             tu_plan_deseado = match.group()
+        else:
+            match = re.search(r'\d{5}', planb)
+            if match:
+                tu_plan_deseado = match.group()
         mi_plan=int(tu_plan_deseado)
         #seleccion
         #ciclo
