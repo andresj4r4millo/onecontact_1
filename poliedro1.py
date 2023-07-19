@@ -438,48 +438,50 @@ def forms2(correo,plan,selleccion):
     while True:
         try:
             time.sleep(2)
-            driver.find_element('xpath',selleccion).click()
+            driver.find_element(By.XPATH,selleccion).click()
+            paso="si"
             time.sleep(2)
             #CONTINUAR //*[@id="btnNext"]
-            driver.find_element('xpath','//*[@id="btnNext"]').click()
-            time.sleep(2)
+            driver.find_element(By.XPATH,'//*[@id="btnNext"]').click()
             paso="si"
+            break
         except:
             try:
-                driver.find_element(By.XPATH,'//*[@id="CampaignsViewModel_SelectedCampaigns"]').click()
+                time.sleep(2)
+                driver.find_element('xpath',selleccion).click()
+                paso="si"
+                time.sleep(2)
+                #CONTINUAR //*[@id="btnNext"]
+                driver.find_element(By.XPATH,'//*[@id="btnNext"]').click()
+                
+                break
             except:
                 paso="no" 
                 cone+=1
         if paso=="si" or cone>=8:
 
             break
- 
+    time.sleep(4)
     #PASOS PARA ENVIAR EL RECHAZO A LA BASE
     cone=0
-    while cone<=5:
+    while True:
         try:
             time.sleep(2)
             #CONTINUAR //*[@id="btnNext"]
             driver.find_element(By.XPATH,'//*[@id="btnNext"]').click()
             time.sleep(2)
-            driver.find_element('xpath','//*[@id="MsgModal"]/div/button[2]').click()
+            driver.find_element(By.XPATH,'//*[@id="MsgModal"]/div/button[2]').click()
             time.sleep(2)
             #activar  
-            driver.find_element('xpath','//*[@id="btnNext"]').click()
+            driver.find_element(By.XPATH,'//*[@id="btnNext"]').click()
+            print("activado")
             time.sleep(2)
             break
         except:
             cone+=1
-    if cone>=5:
-        try:
+            if cone==10:
+                return "no se pudo enviar"
 
-            driver.find_element(By.XPATH,'//*[@id="btnPrev"]').click()
-            time.sleep(1)
-            return"error al momento de enviar el rechazo(pago minimo)"
-        except:
-            driver.find_element(By.XPATH,'//*[@id="btnPrev"]').click()
-            time.sleep(1)
-            return"error al momento de enviar el rechazo(pago minimo)"
 
     print(f"rechazo enviado")
     print(f"cedula: {cedula}")
@@ -512,6 +514,8 @@ def forms2(correo,plan,selleccion):
             break
         except:
             cone+=1
+            if cone==4 or cone==5 or cone==6:
+                return "enviado"
     cone=0
     while acept !="si":
         try:
@@ -547,16 +551,7 @@ def forms2(correo,plan,selleccion):
             acept="si"
             driver.switch_to.default_content()
         except:
-
-            modal = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.ID, "MsgModal"))
-            )
-            button = modal.find_element(By.XPATH,'//*[@id="MsgModal"]/div/button[2]')#//*[@id="MsgModal"]/div/button[2]
-            time.sleep(1)
-            button.click()
-            acept="si"
-            driver.switch_to.default_content()
-
+            return "enviado"
     while True:
         try:
             if cone>=4:  
