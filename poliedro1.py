@@ -456,7 +456,7 @@ def forms2(correo,plan,selleccion):
  
     #PASOS PARA ENVIAR EL RECHAZO A LA BASE
     cone=0
-    while cone<=4:
+    while cone<=5:
         try:
             time.sleep(2)
             #CONTINUAR //*[@id="btnNext"]
@@ -470,7 +470,7 @@ def forms2(correo,plan,selleccion):
             break
         except:
             cone+=1
-    if cone>=4:
+    if cone>=5:
         try:
 
             driver.find_element(By.XPATH,'//*[@id="btnPrev"]').click()
