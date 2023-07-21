@@ -453,13 +453,12 @@ def forms2(correo,plan,selleccion):
                 time.sleep(2)
                 #CONTINUAR //*[@id="btnNext"]
                 driver.find_element(By.XPATH,'//*[@id="btnNext"]').click()
-                
+                paso="si"
                 break
             except:
                 paso="no" 
                 cone+=1
         if paso=="si" or cone>=8:
-
             break
     time.sleep(4)
     #PASOS PARA ENVIAR EL RECHAZO A LA BASE
@@ -712,12 +711,12 @@ with open('BASEP2.csv', 'w', encoding='utf-8', newline='') as archivo:
         if not fila_deseada.empty:
             # Obtiene el dato correspondiente según la convergencia
             if convergencia == "SI":
-                seleccion = str(fila_deseada['SI'].iloc[0])
+                selleccion = str(fila_deseada['SI'].iloc[0])
             else:
-                seleccion = str(fila_deseada['NO'].iloc[0])
+                selleccion = str(fila_deseada['NO'].iloc[0])
         else:
             # Si no se encontró una coincidencia, asigna una selección por defecto
-            seleccion = "/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div/div[5]/div/div/div/div[2]/div[10]/fieldset/div[1]/span/span/input"
+            selleccion = "/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div/div[5]/div/div/div/div[2]/div[10]/fieldset/div[1]/span/span/input"
         complemento=""
 
 
@@ -727,7 +726,7 @@ with open('BASEP2.csv', 'w', encoding='utf-8', newline='') as archivo:
         if complemento == "":
             complemento=validaciones()
             if complemento =="":
-                complemento=forms2(correo,plan,seleccion)
+                complemento=forms2(correo,plan,selleccion)
         if complemento=="error lista desplegable":
             inicio()
             if complemento=="":
@@ -735,7 +734,7 @@ with open('BASEP2.csv', 'w', encoding='utf-8', newline='') as archivo:
             if complemento == "":
                 complemento=validaciones()
                 if complemento =="":
-                    complemento=forms2(correo,plan,seleccion)
+                    complemento=forms2(correo,plan,selleccion)
 
         #escribir en el libro
         datosfila=(f"{cedula}:  {complemento}")
