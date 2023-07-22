@@ -496,24 +496,18 @@ def forms2(correo,plan,selleccion):
         except TimeoutException:
             intentos += 1
             if intentos == max_intentos:
-                print("Error: No se pudo encontrar o hacer clic en el botón del modal.")
-                #driver.back()
-                modal_id = "MsgModal"
-                # Ejecutar JavaScript para cerrar la ventana modal
-                driver.execute_script(f'document.getElementById("{modal_id}").style.display = "none";')
-                return "rechazo enviado"
-                break
+                try:
+                    modal_id = "MsgModal"
+                    # Ejecutar JavaScript para cerrar la ventana modal
+                    driver.execute_script(f'document.getElementById("{modal_id}").style.display = "none";')
+                    return "rechazo enviado"
+                except:
+                    print("Error: No se pudo encontrar o hacer clic en el botón del modal.")
+                    driver.back()
+                
+                    break
+    return "enviado"
 
-    while True:
-        try:
-            if cone>=4:  
-                driver.find_element(By.XPATH,'//*[@id="btnPrev"]').click()
-                return "enviado"
-            else:
-                driver.find_element(By.XPATH,'//*[@id="btnPrev"]').click()
-                return "enviado"
-        except:
-            return "enviado"
     #lineas de codigo para generar un regreso en la pagina en caso de intermitencias
     
 
