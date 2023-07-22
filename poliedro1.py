@@ -14,6 +14,7 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select
+from selenium.common.exceptions import TimeoutException
 
 model_e="MOTOROLA"
 cone=0
@@ -47,6 +48,7 @@ def formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim):
                 #NO TRAJO EQUIPO
                 #driver.find_element('xpath','//*[@id="DetailProduct_WithoutImeiRegistryCheck"]').click()
                 #CEDULA ASESOR
+
                 accion = ActionChains(driver)
                 accion.double_click(driver.find_element('xpath','//*[@id="DetailProduct_SellerId"]')).perform()
                 driver.find_element('xpath','//*[@id="DetailProduct_SellerId"]').send_keys(cedulaa)
@@ -107,6 +109,7 @@ def formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim):
             if cone>4:
                 cedulaa=cedulag
             try:
+                time.sleep(2)
                 accion = ActionChains(driver)
                 accion.double_click(driver.find_element('xpath','//*[@id="DetailProduct_SellerId"]')).perform()
                 time.sleep(1)
@@ -437,120 +440,64 @@ def forms2(correo,plan,selleccion):
     cone=0
     while True:
         try:
-            time.sleep(2)
-            driver.find_element(By.XPATH,selleccion).click()
-            paso="si"
+            time.sleep(4)
+            driver.find_element('xpath',selleccion).click()
             time.sleep(2)
             #CONTINUAR //*[@id="btnNext"]
-            driver.find_element(By.XPATH,'//*[@id="btnNext"]').click()
+            driver.find_element('xpath','//*[@id="btnNext"]').click()
+            time.sleep(3)
             paso="si"
-            break
         except:
-            try:
-                time.sleep(2)
-                driver.find_element('xpath',selleccion).click()
-                paso="si"
-                time.sleep(2)
-                #CONTINUAR //*[@id="btnNext"]
-                driver.find_element(By.XPATH,'//*[@id="btnNext"]').click()
-                paso="si"
-                break
-            except:
-                paso="no" 
-                cone+=1
+            paso="no" 
+            cone+=1
         if paso=="si" or cone>=8:
             break
+    if (cone==8 or cone==9 )and paso!="si":
+        return"no se cargo la campaña de beneficios"
     time.sleep(4)
     #PASOS PARA ENVIAR EL RECHAZO A LA BASE
+    paso="no"
     cone=0
     while True:
         try:
             time.sleep(2)
             #CONTINUAR //*[@id="btnNext"]
             driver.find_element(By.XPATH,'//*[@id="btnNext"]').click()
-            time.sleep(2)
-            driver.find_element(By.XPATH,'//*[@id="MsgModal"]/div/button[2]').click()
-            time.sleep(2)
+            time.sleep(3)
+            driver.find_element('xpath','//*[@id="MsgModal"]/div/button[2]').click()
+            time.sleep(4)
             #activar  
-            driver.find_element(By.XPATH,'//*[@id="btnNext"]').click()
-            print("activado")
+            driver.find_element('xpath','//*[@id="btnNext"]').click()
             time.sleep(2)
+            paso="si"
             break
         except:
             cone+=1
             if cone==10:
                 return "no se pudo enviar"
-
-
+            elif paso=="si":
+                break
     print(f"rechazo enviado")
     print(f"cedula: {cedula}")
-    acept="no"    
-    cone=0
-    """
-    time.sleep(3)
-    modal = WebDriverWait(driver, 10).until(
-    EC.presence_of_element_located((By.ID, "MsgModal"))
-    )
-    button = modal.find_element(By.XPATH,'//*[@id="MsgModal"]/div/button[2]')#//*[@id="MsgModal"]/div/button[2]
-    time.sleep(1)
-    button.click()
-    print("enviado)
+    max_intentos = 4
+    intentos = 0
 
-    """
-    while cone<=4:
+    while intentos < max_intentos:
         try:
+            time.sleep(6)
             modal = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.ID, "MsgModal"))
+                EC.presence_of_element_located((By.ID, "MsgModal"))
             )
-            button = modal.find_element(By.XPATH,'//*[@id="MsgModal"]/div/button[2]')#//*[@id="MsgModal"]/div/button[2]
-            time.sleep(1)
+            button = modal.find_element(By.XPATH,'//*[@id="MsgModal"]/div/button[2]')
             button.click()
-
-            #pasos finales 
-            button.click()
-            #driver.find_element('xpath','//*[@id="btnPrev"]').click() //*[@id="btnPrev"]
-            acept="si"
-            break
-        except:
-            cone+=1
-            if cone==4 or cone==5 or cone==6:
-                return "enviado"
-    cone=0
-    while acept !="si":
-        try:
-            modal = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.ID, "MsgModal"))
-            )
-            button = modal.find_element(By.XPATH,'//*[@id="MsgModal"]/div/button[2]')#//*[@id="MsgModal"]/div/button[2]
-            time.sleep(1)
-            button.click()
-            modal.find_element(By.XPATH,'//*[@id="MsgModal"]/div/button[2]').click()
-            acept="si"
-            cone=0
-            break
-        except:
-            cone+=1
-            if cone>=8: 
-                break
-            continue
-
-    if acept=="si":
-        driver.switch_to.default_content()
-        #return "enviado"
-    else:
-        try:
-
-            modal = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.ID, "MsgModal"))
-            )
-            button = modal.find_element(By.XPATH,'//*[@id="MsgModal"]/div/button[2]')#//*[@id="MsgModal"]/div/button[2]
-            time.sleep(1)
-            button.click()
-            #modal.find_element(By.XPATH,'//*[@id="MsgModal"]/div/button[2]').click()
-            acept="si"
             driver.switch_to.default_content()
-        except:
-            return "enviado"
+            break  # Si el clic es exitoso, salimos del bucle
+        except TimeoutException:
+            intentos += 1
+            if intentos == max_intentos:
+                print("Error: No se pudo encontrar o hacer clic en el botón del modal.")
+                break
+
     while True:
         try:
             if cone>=4:  
@@ -701,21 +648,25 @@ with open('BASEP2.csv', 'w', encoding='utf-8', newline='') as archivo:
         mi_plan=int(tu_plan_deseado)
         #seleccion
         #ciclo
-        print(f"{operador}, {mi_plan}, {convergencia}")
-        data_frame = pd.read_excel('CAMPAÑASB.xlsx', sheet_name='Hoja1')
+        try:
+            print(f"{operador}, {mi_plan}, {convergencia}")
+            data_frame = pd.read_excel('CAMPAÑASB.xlsx', sheet_name='Hoja1')
 
-        # Filtra el DataFrame para obtener la fila deseada
-        fila_deseada = data_frame.loc[(data_frame['PLAN'] == mi_plan) & (data_frame['OPERADOR'] == operador)]
+            # Filtra el DataFrame para obtener la fila deseada
+            fila_deseada = data_frame.loc[(data_frame['PLAN'] == mi_plan) & (data_frame['OPERADOR'] == operador)]
 
-        # Verifica si se encontró una coincidencia
-        if not fila_deseada.empty:
-            # Obtiene el dato correspondiente según la convergencia
-            if convergencia == "SI":
-                selleccion = str(fila_deseada['SI'].iloc[0])
+            # Verifica si se encontró una coincidencia
+            if not fila_deseada.empty:
+                # Obtiene el dato correspondiente según la convergencia
+                if convergencia == "SI":
+                    selleccion = str(fila_deseada['SI'].iloc[0])
+                else:
+                    selleccion = str(fila_deseada['NO'].iloc[0])
             else:
-                selleccion = str(fila_deseada['NO'].iloc[0])
-        else:
-            # Si no se encontró una coincidencia, asigna una selección por defecto
+                # Si no se encontró una coincidencia, asigna una selección por defecto
+                selleccion = "/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div/div[5]/div/div/div/div[2]/div[10]/fieldset/div[1]/span/span/input"
+        except:
+            print("no se encontro libro de campañas, selexion por defecto todo claro")
             selleccion = "/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div/div[5]/div/div/div/div[2]/div[10]/fieldset/div[1]/span/span/input"
         complemento=""
 
@@ -727,7 +678,7 @@ with open('BASEP2.csv', 'w', encoding='utf-8', newline='') as archivo:
             complemento=validaciones()
             if complemento =="":
                 complemento=forms2(correo,plan,selleccion)
-        if complemento=="error lista desplegable":
+        if complemento=="error lista desplegable" or complemento=="no se cargo la campaña de beneficios":
             inicio()
             if complemento=="":
                 complemento=formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim)
