@@ -497,7 +497,10 @@ def forms2(correo,plan,selleccion):
             intentos += 1
             if intentos == max_intentos:
                 print("Error: No se pudo encontrar o hacer clic en el botón del modal.")
-                driver.back()
+                #driver.back()
+                modal_id = "MsgModal"
+                # Ejecutar JavaScript para cerrar la ventana modal
+                driver.execute_script(f'document.getElementById("{modal_id}").style.display = "none";')
                 return "rechazo enviado"
                 break
 
