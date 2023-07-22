@@ -473,20 +473,21 @@ def forms2(correo,plan,selleccion):
             break
         except:
             cone+=1
-            if cone==10:
+            if cone>=10:
                 return "no se pudo enviar"
             elif paso=="si":
                 break
+
     print(f"rechazo enviado")
     print(f"cedula: {cedula}")
-    max_intentos = 4
+    max_intentos = 5
     intentos = 0
 
     while intentos < max_intentos:
         try:
             time.sleep(6)
             modal = WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.ID, "MsgModal"))
+            EC.presence_of_element_located((By.ID, "MsgModal"))
             )
             button = modal.find_element(By.XPATH,'//*[@id="MsgModal"]/div/button[2]')
             button.click()
@@ -496,6 +497,8 @@ def forms2(correo,plan,selleccion):
             intentos += 1
             if intentos == max_intentos:
                 print("Error: No se pudo encontrar o hacer clic en el botón del modal.")
+                driver.back()
+                return "rechazo enviado"
                 break
 
     while True:
@@ -510,16 +513,6 @@ def forms2(correo,plan,selleccion):
             return "enviado"
     #lineas de codigo para generar un regreso en la pagina en caso de intermitencias
     
-
-    
-    
-    
-
-
-    
-
-
-
 
 
 #FUNCION PARA INGRESAR A POLIEDRO, CON USUARIO, CONTRASEÑA Y TOKEN
