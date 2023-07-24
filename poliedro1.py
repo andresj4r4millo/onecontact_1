@@ -51,6 +51,7 @@ def formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim):
 
                 accion = ActionChains(driver)
                 accion.double_click(driver.find_element('xpath','//*[@id="DetailProduct_SellerId"]')).perform()
+                time.sleep(3)
                 driver.find_element('xpath','//*[@id="DetailProduct_SellerId"]').send_keys(cedulaa)
                 time.sleep(2)
                 #CHECK PORTABILIDAD NUMERICA    //*[@id="DetailProduct_PortabilityNumberCheck"]
@@ -104,7 +105,7 @@ def formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim):
     except:
         #SI LA CONSULTA NO SE REALIZA EL SIGUIENTE BUCLE DIGITA NUEVAMENTE LA CEDULA DEL ASESOR, LA FECHA Y REALIZA LA CONSULTA HASTA QUE SE REDIRIGA AL SISGUIENTE FORM
         cone=0
-        while cone<8:
+        while cone<10:
             #comenzar a usar cedula generica
             if cone>4:
                 cedulaa=cedulag
@@ -127,19 +128,20 @@ def formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim):
                     print("sim adquirida")
                     complement="sim adquirida"
                     cone=8
-                    break  
-                except:
+                    break 
 
-                    driver.find_element('xpath','//*[@id="btnNext"]').click()
+                except:
+                    time.sleep(1)
+                    driver.find_element(By.XPATH,'//*[@id="btnNext"]').click()
                     ##FORMULARIO 2    
                     #para confirmar que la pagina se redirecciona
                     time.sleep(4)
-                    driver.find_element('xpath','/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div/div[5]/div[2]/div[11]/div/div[2]/div[2]/div').click()
+                    driver.find_element(By.XPATH,'//*[@id="toggleValidationErrorBTN"]/span').click()
                     paso="si"
                     cone=0
                     break
             except: 
-                if cone==8:
+                if cone==10:
                     break
                 elif paso=="si":
                     break
@@ -150,7 +152,7 @@ def formularios(cedulag,cedula,apellido,cedulaa,celular,nip,fechap,serialsim):
 
     #ESTAS LINEAS DE CODIGO GENERARAN ERROR SI LA PAGINA NO REALIZA LA CONSULTA DESPUES DE 6 INTENTOS
 
-    if cone>=8:
+    if cone>=10:
         return "consulta no realizada"
     elif paso=="si":
         print("en espera por validacion")
@@ -180,12 +182,14 @@ def validaciones():
         except:
             #regresar
             cone+=1
+
             continue 
     if cone>=4:   
         try:
             porta = driver.find_element(By.XPATH, '//*[@id="viewErrors"]/ul/li[2]')
             validacion=porta.text
         except:
+
             #//*[@id="validationResponses"]/div[5]/div[2]/div[11]/div/div[2]/div[1]
             validaciones=driver.find_element(By.XPATH, '//*[@id="viewErrors"]/ul/li[2]')
             validacion=validaciones.text   
@@ -445,11 +449,23 @@ def forms2(correo,plan,selleccion):
             time.sleep(2)
             #CONTINUAR //*[@id="btnNext"]
             driver.find_element('xpath','//*[@id="btnNext"]').click()
-            time.sleep(3)
+            time.sleep(4)
+            driver.find_element(By.XPATH,'//*[@id="group_21"]/div/div/div[1]/div[1]/div/span/span[1]/span/span[2]').click()
+            #//*[@id="group_21"]/div/div/div[1]/div[1]/div/span/span[1]/span/span[2]
             paso="si"
         except:
-            paso="no" 
-            cone+=1
+            try:
+                time.sleep(4)
+                driver.find_element('xpath',selleccion).click()
+                time.sleep(2)
+                #CONTINUAR //*[@id="btnNext"]
+                driver.find_element('xpath','/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div/div[5]/div/div/div/div[2]/div[2]/fieldset/div[1]/span/span/input').click()
+                time.sleep(3)
+                paso="si"
+                
+            except:
+                paso="no" 
+                cone+=1
         if paso=="si" or cone>=8:
             break
     if (cone==8 or cone==9 )and paso!="si":
@@ -463,17 +479,18 @@ def forms2(correo,plan,selleccion):
             time.sleep(2)
             #CONTINUAR //*[@id="btnNext"]
             driver.find_element(By.XPATH,'//*[@id="btnNext"]').click()
-            time.sleep(3)
-            driver.find_element('xpath','//*[@id="MsgModal"]/div/button[2]').click()
-            time.sleep(4)
-            #activar  
+            time.sleep(3)#//*[@id="btnNext"]
+            #driver.find_element('xpath','//*[@id="MsgModal"]/div/button[2]').click()
             driver.find_element('xpath','//*[@id="btnNext"]').click()
-            time.sleep(2)
+            time.sleep(4)
+            #activar  #//*[@id="btnNext"]
+            driver.find_element('xpath','//*[@id="btnNext"]').click()
             paso="si"
             break
         except:
             cone+=1
             if cone>=10:
+                driver.back()
                 return "no se pudo enviar"
             elif paso=="si":
                 break
@@ -492,20 +509,23 @@ def forms2(correo,plan,selleccion):
             button = modal.find_element(By.XPATH,'//*[@id="MsgModal"]/div/button[2]')
             button.click()
             driver.switch_to.default_content()
+            time.sleep(2)
+            driver.find_element(By.XPATH,'//*[@id="btnPrev"]').click()
             break  # Si el clic es exitoso, salimos del bucle
         except TimeoutException:
             intentos += 1
             if intentos == max_intentos:
                 try:
+                    driver.find_element(By.XPATH,'//*[@id="btnPrev"]').click()
+                    break
+                except:
                     modal_id = "MsgModal"
                     # Ejecutar JavaScript para cerrar la ventana modal
                     driver.execute_script(f'document.getElementById("{modal_id}").style.display = "none";')
                     return "rechazo enviado"
-                except:
-                    print("Error: No se pudo encontrar o hacer clic en el botón del modal.")
-                    driver.back()
-                
-                    break
+
+    #//*[@id="btnNext"]
+    #driver.back()
     return "enviado"
 
     #lineas de codigo para generar un regreso en la pagina en caso de intermitencias
@@ -523,6 +543,7 @@ def ingreso():
     #IR A INICIO POLIEDRO
     driver.find_element('xpath','//*[@id="ctl00_ContentPlaceHolder1_BtnRegresarMensaje"]').click()
     #ESPERAR A QUE CARGUE LA PAGINA WEB202
+
 def activacion_pospago():
 
     time.sleep(4)
@@ -654,11 +675,12 @@ with open('BASEP2.csv', 'w', encoding='utf-8', newline='') as archivo:
                     selleccion = str(fila_deseada['NO'].iloc[0])
             else:
                 # Si no se encontró una coincidencia, asigna una selección por defecto
-                selleccion = "/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div/div[5]/div/div/div/div[2]/div[10]/fieldset/div[1]/span/span/input"
+                selleccion = "/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div/div[5]/div/div/div/div[2]/div[2]/fieldset/div[1]/span/span/input"
         except:
             print("no se encontro libro de campañas, selexion por defecto todo claro")
-            selleccion = "/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div/div[5]/div/div/div/div[2]/div[10]/fieldset/div[1]/span/span/input"
+            selleccion = "/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div/div[5]/div/div/div/div[2]/div[2]/fieldset/div[1]/span/span/input"
         complemento=""
+        selleccion=str(selleccion)
 
 
         inicio()
