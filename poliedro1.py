@@ -660,7 +660,7 @@ with open('BASEP2.csv', 'w', encoding='utf-8', newline='') as archivo:
         #seleccion
         #ciclo
         try:
-            print(f"{operador}, {mi_plan}, {convergencia}")
+            #print(f"{operador}, {mi_plan}, {convergencia}")
             data_frame = pd.read_excel('CAMPAÑASB.xlsx', sheet_name='Hoja1')
 
             # Filtra el DataFrame para obtener la fila deseada
