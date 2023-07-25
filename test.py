@@ -1,5 +1,9 @@
 import pandas as pd
 
+
+
+
+
 # Lee el archivo Excel
 data_frame = pd.read_excel('CAMPAÑASB.xlsx', sheet_name='Hoja1')
 

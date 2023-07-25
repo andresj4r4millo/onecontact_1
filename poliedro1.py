@@ -512,7 +512,7 @@ def forms2(correo,plan,selleccion):
             time.sleep(2)
             driver.find_element(By.XPATH,'//*[@id="btnPrev"]').click()
             break  # Si el clic es exitoso, salimos del bucle
-        except TimeoutException:
+        except :
             intentos += 1
             if intentos == max_intentos:
                 try:
