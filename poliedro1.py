@@ -459,10 +459,11 @@ def forms2(correo,plan,selleccion):
                 driver.find_element('xpath',selleccion).click()
                 time.sleep(2)
                 #CONTINUAR //*[@id="btnNext"]
-                driver.find_element('xpath','/html/body/div/div[2]/section/div/div[2]/div[2]/main/form/div/div[5]/div/div/div/div[2]/div[2]/fieldset/div[1]/span/span/input').click()
-                time.sleep(3)
-                paso="si"
-                
+                driver.find_element('xpath','//*[@id="btnNext"]').click()
+                time.sleep(4)
+                driver.find_element(By.XPATH,'//*[@id="group_21"]/div/div/div[1]/div[1]/div/span/span[1]/span/span[2]').click()
+                #//*[@id="group_21"]/div/div/div[1]/div[1]/div/span/span[1]/span/span[2]
+                paso="si"    
             except:
                 paso="no" 
                 cone+=1
@@ -704,10 +705,10 @@ with open('BASEP2.csv', 'w', encoding='utf-8', newline='') as archivo:
         print(datosfila)
         archivo.write(datosfila + '\n')
         archivo.flush()
-        print("onecontact")
+        
         continue
     
-           
+print("onecontact")            
 
 
 
