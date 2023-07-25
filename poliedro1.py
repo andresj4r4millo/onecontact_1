@@ -453,6 +453,7 @@ def forms2(correo,plan,selleccion):
             driver.find_element(By.XPATH,'//*[@id="group_21"]/div/div/div[1]/div[1]/div/span/span[1]/span/span[2]').click()
             #//*[@id="group_21"]/div/div/div[1]/div[1]/div/span/span[1]/span/span[2]
             paso="si"
+
         except:
             try:
                 time.sleep(4)
@@ -463,20 +464,28 @@ def forms2(correo,plan,selleccion):
                 time.sleep(4)
                 driver.find_element(By.XPATH,'//*[@id="group_21"]/div/div/div[1]/div[1]/div/span/span[1]/span/span[2]').click()
                 #//*[@id="group_21"]/div/div/div[1]/div[1]/div/span/span[1]/span/span[2]
-                paso="si"    
+                paso="si"
+
             except:
+
                 paso="no" 
                 cone+=1
+
         if paso=="si" or cone>=8:
+
             break
     if (cone==8 or cone==9 )and paso!="si":
+
         return"no se cargo la campaña de beneficios"
+    
     time.sleep(4)
     #PASOS PARA ENVIAR EL RECHAZO A LA BASE
     paso="no"
     cone=0
+
     while True:
         try:
+
             time.sleep(2)
             #CONTINUAR //*[@id="btnNext"]
             driver.find_element(By.XPATH,'//*[@id="btnNext"]').click()
@@ -487,14 +496,18 @@ def forms2(correo,plan,selleccion):
             #activar  #//*[@id="btnNext"]
             driver.find_element('xpath','//*[@id="btnNext"]').click()
             paso="si"
+
             break
         except:
             cone+=1
             if cone>=10:
                 driver.back()
+
                 return "no se pudo enviar"
             elif paso=="si":
+
                 break
+
 
     print(f"rechazo enviado")
     print(f"cedula: {cedula}")
@@ -512,17 +525,22 @@ def forms2(correo,plan,selleccion):
             driver.switch_to.default_content()
             time.sleep(2)
             driver.find_element(By.XPATH,'//*[@id="btnPrev"]').click()
+            
+
             break  # Si el clic es exitoso, salimos del bucle
+
         except :
             intentos += 1
             if intentos == max_intentos:
                 try:
                     driver.find_element(By.XPATH,'//*[@id="btnPrev"]').click()
+
                     break
                 except:
                     modal_id = "MsgModal"
                     # Ejecutar JavaScript para cerrar la ventana modal
                     driver.execute_script(f'document.getElementById("{modal_id}").style.display = "none";')
+
                     return "rechazo enviado"
 
     #//*[@id="btnNext"]
